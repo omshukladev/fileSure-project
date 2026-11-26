@@ -6,10 +6,6 @@
   --color-ink: oklch(0.23 0.012 70);
   --color-ink-muted: oklch(0.46 0.015 70);
 
-  /* Instrument panel: dark ink with a phosphor readout */
-  --color-phosphor: oklch(0.79 0.15 78);
-  --color-phosphor-dim: oklch(0.78 0.01 80);
-
   /* The second colour of a two colour press */
   --color-orange: oklch(0.55 0.15 42);
 
@@ -36,10 +32,20 @@
     font-family: var(--font-sans);
   }
 
-  /* Keyboard users get a thick, obvious ring, in the press colour. Never removed. */
+  /* Keyboard users get a thick, obvious ring, in the press colour. Never removed.
+     outline-color is deliberately excluded from any transition so the ring paints
+     at full contrast on the first frame, not 150ms later. */
   :focus-visible {
     outline: 2px solid var(--color-orange);
     outline-offset: 3px;
+    transition: none;
+  }
+
+  /* Forced-colours users keep a system ring rather than an authored one that may vanish. */
+  @media (forced-colors: active) {
+    :focus-visible {
+      outline: 3px solid Highlight;
+    }
   }
 }
 
@@ -79,28 +85,128 @@
     font-variant-numeric: tabular-nums;
   }
 
+  /* The paste field: resting and focus. The border stays ink in every
+     state, so the field never looks disabled. */
+  .field-codes {
+    transition: background-color 150ms ease-out;
+    touch-action: manipulation;
+  }
+
+  /* Primary control. One place defines every state the button can enter:
+     resting, hover (pointer devices only), pressed, and unavailable.
+     The unavailable state is driven by aria-disabled, not the disabled
+     attribute, so the control stays reachable and keeps announcing why. */
+  .control-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+    padding: 0.75rem 1.5rem;
+    border: 2px solid var(--color-ink);
+    background-color: var(--color-ink);
+    color: var(--color-paper);
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    touch-action: manipulation;
+    transition:
+      background-color 150ms ease-out,
+      border-color 150ms ease-out,
+      transform 100ms ease-out;
+  }
+
+  .control-primary:not([aria-disabled="true"]):active {
+    transform: scale(0.97);
+  }
+
+  /* Unavailable: recedes without pretending the action worked,
+     and still reads at 6.65:1 against the paper. */
+  .control-primary[aria-disabled="true"] {
+    border-color: var(--color-ink-muted);
+    background-color: var(--color-ink-muted);
+    cursor: not-allowed;
+  }
+
   /* One arrival beat per element, not a blanket scroll reveal */
   .rise {
     animation: rise 520ms cubic-bezier(0.16, 0.84, 0.28, 1) both;
   }
 
   .rise-2 {
-    animation-delay: 70ms;
+    animation-delay: 80ms;
   }
 
   .rise-3 {
-    animation-delay: 150ms;
+    animation-delay: 160ms;
+  }
+
+  /* The specimen's six underlines draw in sequence, left to right, because
+     the one fact this diagram teaches is that a CIN's blocks arrive in a
+     fixed order. Only the rules move: the characters are solid at paint,
+     so nothing readable is ever withheld. */
+  .specimen-rule {
+    position: relative;
+  }
+
+  .specimen-rule::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 1px;
+    background-color: var(--color-rule-strong);
+    transform-origin: left center;
+    animation: rule-draw 320ms cubic-bezier(0.16, 0.84, 0.28, 1) both;
+    animation-delay: calc(220ms + var(--block-index, 0) * 45ms);
+  }
+
+  /* A written figure lands by dropping into place, the way a stamped digit
+     would. Keyed on the value so it replays when the count changes, and it
+     is only ever applied to a number that just arrived. */
+  .reading {
+    display: inline-block;
+    transform-origin: center bottom;
+  }
+
+  .reading-write {
+    animation: figure-write 180ms cubic-bezier(0.16, 0.84, 0.28, 1) both;
   }
 }
 
-@keyframes rise {
+@keyframes figure-write {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(-0.18em);
   }
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+@keyframes rule-draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Ink settling onto the page: a short lift, a fade, and a touch of blur
+   that clears. Only transform, opacity and filter move. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
   }
 }
 
@@ -111,5 +217,52 @@
     animation: none;
     opacity: 1;
     transform: none;
+    filter: none;
   }
+
+  /* The rules stay drawn. Losing them would remove the diagram, not just its motion. */
+  .specimen-rule::after {
+    animation: none;
+    transform: scaleX(1);
+  }
+
+  /* A figure still arrives; it just does not travel to get there. */
+  .reading-write {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .field-codes,
+  .control-primary {
+    transition: none;
+  }
+
+  .control-primary:not([aria-disabled="true"]):active {
+    transform: none;
+  }
+}
+
+/* Hover is a pointer-device affordance, never the only way to reach anything.
+   Declared outside @layer utilities because the compiler drops nested
+   at-rules placed inside that layer. Focus is declared after hover so a
+   focused field stays white even while the cursor rests on it. */
+@media (hover: hover) and (pointer: fine) {
+  .field-codes:hover:not(:focus) {
+    background-color: color-mix(in oklch, var(--color-paper) 30%, white);
+  }
+
+  .control-primary:not([aria-disabled="true"]):hover {
+    border-color: var(--color-orange);
+    background-color: var(--color-orange);
+  }
+
+  .control-primary[aria-disabled="true"]:hover {
+    border-color: var(--color-ink-muted);
+    background-color: var(--color-ink-muted);
+  }
+}
+
+.field-codes:focus {
+  background-color: white;
 }

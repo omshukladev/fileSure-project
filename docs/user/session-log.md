@@ -12,6 +12,61 @@ Each entry keeps the same shape:
 
 ---
 
+## Session 4: Design passes, motion, audit and verification
+
+**Date:** 26 November 2026
+**Branch:** `main`, ahead of `origin/main` by this commit
+
+### Goal
+
+Give the page a real visual direction instead of the scaffold default, fix the problems the checkup found, then audit the docs and prove the whole stack still verifies.
+
+### Did
+
+1. Ran `/design style retro-futurism`, which settled on a late 1960s government data processing bureau: cream printout stock, two colour press, monospaced identifiers, square corners, rules instead of shadows.
+2. Ran `/design checkup`, which scored the page 30 of 60 and blocked it on two HIGH findings: an inert button and a placeholder at 2.77:1 contrast.
+3. Ran `/design a11y`, which fixed the placeholder contrast to 6.94:1, narrowed the focus transition so the ring paints at full contrast immediately, and made the unavailable button use `aria-disabled` so it stays reachable.
+4. Ran `/design interaction`, which gave the button and the paste field real resting, hover, pressed, focus and unavailable states from one rule set.
+5. Ran `/design motion`, which added three behaviours: the six specimen underlines draw left to right in the order the diagram teaches, the entrance gained a blur that clears so the ink settles onto the paper, and the readout figures drop in and replay on value change.
+6. Ran `/audit`, which found the root `AGENTS.md` held only the 9 line Next.js note and filled it with the real stack, build approach, commands, eight rules, five gotchas and context pointers.
+7. Fixed three documentation drifts: a phantom `--radius-md` token, two unused `--phosphor` tokens, and a motion table that still said 70ms where the code says 80ms.
+8. Ran every step in `verify.md` for real and ticked them, closing feature 1.
+9. Wrote `docs/user/checklist.md` so the remaining phases are trackable in plain language.
+
+### Decisions
+
+| Decision | Reason |
+|---|---|
+| The specimen underlines draw, the characters never fade | The diagram exists to teach block order, so the motion is that fact. Keeping characters solid means no readable value is ever withheld |
+| Only the poster, prose and specimen animate | The form must be usable the instant it paints. A tool should not perform before it works |
+| Motion is opt in, static is the default | The page works with animation off, so reduced motion is not a patch bolted on afterwards |
+| `aria-disabled` instead of `disabled` | A disabled attribute removes the button from the tab order, taking its explanation with it |
+| Accent orange used exactly three times | It reads as emphasis because it is rare. More would make it decoration |
+| No shadcn/ui installed yet | The page has three controls and no overlay. Adding a component library it does not use would be weight for a talking point |
+| Deleted the phosphor tokens rather than wiring them | They described a dark instrument palette the page never had. Dead tokens are worse than no tokens |
+| Kept the API story static | A backend would add a round trip, a failure mode, and a fair question about whether pasted CINs leave the machine |
+
+### Errors and corrections
+
+- **`NODE_ENV=production` bit again during the audit.** `npm ci` installed 18 packages instead of 288, so lint failed with `eslint: command not found` and the build with `Cannot find module '@tailwindcss/turbopack'`. Fixed with `env -u NODE_ENV npm ci --include=dev`, which restored all 288. Nothing errored on its own; the package count was the only signal. Logged in `major-error.md`.
+- **A stale `.next` faked a module error.** The build failed on `@tailwindcss/turbopack` even though the package was installed. `rm -rf .next` fixed it. Same class of bug as the earlier stale dev server that made focus lose to hover.
+- **Typecheck fails on a wiped `.next`.** `next-env.d.ts` imports `.next/types/routes.d.ts`, so `tsc --noEmit` complains `Cannot find name 'LayoutProps'`. That is generated type order, not broken code. Build first, then typecheck. Now recorded in `AGENTS.md`.
+- **The focus ring looked paper on paper again for 150ms.** Already fixed in the a11y pass by narrowing the transition, and confirmed still holding in this pass by sampling computed styles.
+- The old verify step asserted the heading `CIN and LLPIN checker`, which the design pass replaced with `Read any company number in one paste`. The check still passes but only matches the document title, so `verify.md` now says so and suggests `Read any company` for rendered text.
+
+### Left over
+
+- The decoder is the next real work, phase 5. Nothing decodes yet, and the button honestly says so.
+- Prettier, Vitest and Playwright are named in the spec but not installed.
+- Feature 4 still needs the card to table switch point decided and written down.
+- The repo is still private, and the brief asks for a public link.
+
+### Git
+
+- Commit below: design passes, motion system, audit and verify.
+
+---
+
 ## Session 3: Scaffolded the app
 
 **Date:** 26 November 2026

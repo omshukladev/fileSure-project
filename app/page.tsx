@@ -9,7 +9,14 @@ const CIN_BLOCKS = [
 
 export default function Home() {
   return (
-    <main className="mx-auto flex min-h-svh w-full max-w-5xl flex-col px-6 py-10 sm:px-10 sm:py-14">
+    <main id="content" className="mx-auto flex min-h-svh w-full max-w-5xl flex-col px-6 py-10 sm:px-10 sm:py-14">
+      <a
+        href="#checker"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:start-6 focus:z-50 focus:border-2 focus:border-ink focus:bg-paper focus:px-4 focus:py-2 focus:font-mono focus:text-sm focus:text-ink"
+      >
+        Skip to the checker
+      </a>
+
       <header className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-rule pb-4">
         <span className="legend text-ink-muted">FileSure</span>
         <span className="legend text-ink-muted">Registry decoder</span>
@@ -33,10 +40,11 @@ export default function Home() {
           <div className="border-t-2 border-ink pt-4 sm:border-t-0 sm:border-s-2 sm:ps-8 sm:pt-0">
             <h2 className="legend text-ink-muted">A CIN, in its six blocks</h2>
             <ol className="mt-4 flex flex-wrap gap-x-3 gap-y-4">
-              {CIN_BLOCKS.map((block) => (
+              {CIN_BLOCKS.map((block, index) => (
                 <li key={block.label} className="flex flex-col gap-1">
                   <span
-                    className={`${block.width} border-b border-rule-strong pb-1 font-mono text-sm font-medium tabular tracking-wide`}
+                    style={{ "--block-index": index } as React.CSSProperties}
+                    className={`specimen-rule ${block.width} pb-1 font-mono text-sm font-medium tabular tracking-wide`}
                   >
                     {block.sample}
                   </span>
@@ -53,7 +61,14 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mt-14 border-y-2 border-ink py-10 sm:mt-20 sm:py-14">
+      <section
+        id="checker"
+        aria-labelledby="checker-heading"
+        className="mt-14 scroll-mt-6 border-y-2 border-ink py-10 sm:mt-20 sm:py-14"
+      >
+        <h2 id="checker-heading" className="sr-only">
+          Check a list of identifiers
+        </h2>
         <div className="grid gap-x-10 gap-y-8 sm:grid-cols-[1fr_auto] sm:items-end">
           <div>
             <label htmlFor="codes" className="legend text-ink-muted">
@@ -77,22 +92,35 @@ export default function Home() {
             name="codes"
             rows={7}
             spellCheck={false}
+            autoComplete="off"
+            autoCapitalize="characters"
             aria-describedby="codes-hint"
             placeholder={"L17110MH1973PLC019786\nU72900KA2010PTC086596\nAAA-1234"}
-            className="ruled block w-full resize-y border border-ink bg-white/70 px-4 py-3 font-mono text-base leading-[2] tracking-wide text-ink placeholder:text-ink-muted/60 focus:bg-white"
+            className="field-codes ruled block w-full resize-y border border-ink bg-white/70 px-4 py-3 font-mono text-base leading-[2] tracking-wide text-ink placeholder:text-ink-muted"
           />
         </div>
 
         <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3">
           <button
             type="button"
-            className="border-2 border-ink bg-ink px-6 py-3 font-mono text-sm font-medium tracking-wide text-paper uppercase transition-colors hover:bg-orange hover:border-orange"
+            aria-disabled="true"
+            aria-describedby="checker-status"
+            className="control-primary"
           >
             Read the list
           </button>
-          <span className="legend text-ink-muted">
-            Nothing is sent anywhere
+          <span id="checker-status" className="legend text-ink-muted">
+            The checker is not built yet
           </span>
+        </div>
+
+        <div
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          className="sr-only"
+        >
+          {"0 identifiers read. 0 valid, 0 not valid."}
         </div>
 
         <dl className="mt-10 grid grid-cols-3 gap-x-6 border-t border-rule pt-6">
@@ -104,7 +132,9 @@ export default function Home() {
             <div key={reading.term} className="flex flex-col gap-2">
               <dt className="legend text-ink-muted">{reading.term}</dt>
               <dd className="font-mono text-2xl tabular text-ink sm:text-3xl">
-                {reading.value}
+                <span key={reading.value} className="reading reading-write">
+                  {reading.value}
+                </span>
               </dd>
             </div>
           ))}

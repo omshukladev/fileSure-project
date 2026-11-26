@@ -69,7 +69,6 @@ This era is **rectangular**. Instruments and forms have corners. There is no pil
 | Token | Value | Role |
 |---|---|---|
 | `--radius-sm` | `2px` | not yet used, reserved |
-| `--radius-md` | `3px` | not yet used, reserved |
 
 Radius is effectively zero on the page. The paste box, the button and the specimen underlines are all square. That is the decision, not an omission.
 
@@ -81,21 +80,30 @@ One arrival beat per element, not a blanket scroll reveal.
 
 | Element | Motion | Timing |
 |---|---|---|
-| Poster title | rise 10px, fade in | 520ms, `cubic-bezier(0.16, 0.84, 0.28, 1)` |
-| Prose and specimen | same rise, offset | +70ms delay |
+| Poster title | rise 10px, fade, blur 4px to 0 | 520ms, `cubic-bezier(0.16, 0.84, 0.28, 1)` |
+| Prose and specimen | same rise, offset | +80ms |
+| Block specimen rules | six underlines draw left to right, `scaleX(0)` to `1` | 320ms each, 45ms stagger from 220ms |
+| Readout figures | drop in from `-0.18em`, replays on value change | 180ms |
+| Primary button press | `scale(0.97)` | 100ms, faster than hover because touch feedback comes first |
 | Everything else | none | the form is readable immediately |
 
-The form section carries no entrance animation, deliberately. A tool must be usable the moment it paints. Only `transform` and `opacity` animate.
+The six specimen underlines are the one piece of motion that explains something: the diagram exists to teach that a CIN's blocks arrive in a fixed order, so the rules draw in that order. Only the rules move. The characters are solid at paint, so no animation ever withholds a readable value.
 
-`prefers-reduced-motion: reduce` sets every animation and transition to `0.01ms` and removes the rise transform entirely, so nothing moves.
+The form section carries no entrance animation, deliberately. A tool must be usable the moment it paints. Only `transform`, `opacity` and `filter` animate; no layout property moves.
+
+`prefers-reduced-motion: reduce` removes the rise entirely, leaves the specimen rules drawn at full scale, and lets figures arrive without travelling. Transitions are off, so nothing moves.
 
 Hover on the button swaps ink fill for orange fill over 150ms. There is no flicker, no glow and no scanline anywhere, because the era is a print bureau rather than a screen.
 
 ## Focus and access
 
-Focus is a `2px` orange outline at `3px` offset on `:focus-visible`, never removed. The orange clears 4.82:1 against the paper, so the ring is visible on every surface it crosses.
+Focus is a `2px` orange outline at `3px` offset on `:focus-visible`, never removed. The orange clears 5.18:1 against the white paste box and 4.82:1 against the paper, so the ring is visible on every surface it crosses. It is excluded from every transition, so it paints at full contrast on the first frame rather than fading in. Under `forced-colors: active` it becomes a `3px` system `Highlight` ring.
 
 The paste box has a real `<label>` and an `aria-describedby` hint. The counts are a `<dl>` with real `<dt>` and `<dd>`. The button is a real `<button type="button">`, not a div. The CIN block specimen is an ordered list because the order is the meaning.
+
+Every control that changes state reports it. A stable `role="status"` region with `aria-live="polite"` and `aria-atomic="true"` holds the running count text, so repeat reads announce consistently rather than inserting a new region each time. It is `sr-only`: it speaks without occupying space.
+
+A skip link is the first focusable element and becomes visible on focus, jumping to the checker section, which carries `scroll-mt-6` so the anchor target is not swallowed by the top edge. The section is a labelled region via `aria-labelledby`.
 
 Colour never carries state alone: the readout labels say "Valid" and "Not valid" in words, not only in colour.
 

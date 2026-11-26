@@ -11,10 +11,10 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 
 | # | Feature | Phase | Status |
 |---|---------|-------|--------|
-| 1 | Stack & architecture | Foundation | in-progress |
-| 2 | Coding standards & tooling | Foundation | planned |
+| 1 | Stack & architecture | Foundation | done |
+| 2 | Coding standards & tooling | Foundation | in-progress |
 | 3 | Decode rules & reference data | Foundation | planned |
-| 4 | Design system & UI foundation | Foundation | planned |
+| 4 | Design system & UI foundation | Foundation | in-progress |
 | 5 | Decoder & test suite | Slice 1 | planned |
 | 6 | Checker page & results | Slice 1 | planned |
 | 7 | Working with long lists | Slice 2 | planned |
@@ -25,20 +25,21 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 
 ## Foundations
 
-### 1. Stack & architecture · in-progress
+### 1. Stack & architecture · done
 Decide how the page is built and scaffold a runnable project so every later slice stands on real structure. One decision worth defending out loud: this page needs no server and no database, because the answer is fully determined by the text the visitor pastes, so a static build answers in under a millisecond, works on any free host, and lets you say honestly that nothing pasted ever leaves the browser.
 **Done when:** the spec records the stack and the "no server, no database" call with its reasoning, and the empty scaffold boots locally and passes a production build.
 - [x] Decide the stack (spec): `/architect stack & architecture`
 - [x] Scaffold from the decision: `/develop stack & architecture`
-- [ ] Verify it: `/check verify stack & architecture`
+- [x] Verify it: `/check verify stack & architecture`
 Spec [0001](../specs/0001-static-web-stack-for-cin-checker/index.md) · code in `app/`, `next.config.ts`
 
-### 2. Coding standards & tooling
+### 2. Coding standards & tooling · in-progress
 Capture the conventions the assignment is judged on (readable code you can explain simply) and install the guards so every later file follows them, from the real scaffold.
 **Done when:** root `AGENTS.md` reflects the real stack, and lint, format and type checking run clean on the scaffold.
-- [ ] Capture conventions + tooling choices: `/audit`
+- [x] Capture conventions + tooling choices: `/audit`
 - [ ] Install the tooling: `/develop tooling`
 - [ ] Check it runs clean: `/check verify tooling`
+Root `AGENTS.md` holds the stack, the Skateboard approach, the commands, eight rules and five gotchas. Prettier, Vitest and Playwright are still to install.
 
 ### 3. Decode rules & reference data · needs a decision
 The one place the domain rules live, because guessing here is what makes a checker wrong. Decides the exact block layout of a CIN, the full table of MCA state codes, the full table of company type codes, how NIC industry digits are described (or deliberately left unexplained), the LLPIN pattern, and the shape of one parsed result plus its error reasons. Everything in slices 1 to 3 rests on this.

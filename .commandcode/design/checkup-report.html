@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>FileSure CIN checker - Checkup Report</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<style>
+		body { font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+		.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+		.report-section { border: 1px solid #222226; background: #0a0a0b; position: relative; }
+		.corner-box { position: absolute; width: 20px; height: 20px; border: 1px solid #222226; background: #000; }
+	</style>
+</head>
+<body class="bg-black text-[#fafafa]">
+	<main class="mx-auto w-full max-w-6xl px-5 py-8 md:px-10 md:py-12">
+		<header class="report-section mb-8 p-6 md:p-8">
+			<div class="corner-box left-0 top-0 -translate-x-1/2 -translate-y-1/2"></div>
+			<div class="corner-box right-0 top-0 translate-x-1/2 -translate-y-1/2"></div>
+			<div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+				<div>
+					<div class="mono mb-2 text-xs tracking-widest text-[#666]">// CHECKUP</div>
+					<h1 class="text-4xl font-bold tracking-tight md:text-6xl">FileSure CIN checker</h1>
+					<p class="mono mt-3 text-xs text-[#555]">app/page.tsx &middot; scaffold stage &middot; spec 0001</p>
+				</div>
+				<div class="mono text-left text-xs text-[#666] md:text-right">
+					<div>COMMANDCODE REPORT</div>
+					<div class="text-[#444]">26 NOVEMBER 2026</div>
+				</div>
+			</div>
+		</header>
+
+		<section class="report-section mb-8 p-6 md:p-8">
+			<div class="corner-box left-0 top-0 -translate-x-1/2 -translate-y-1/2"></div>
+			<div class="corner-box right-0 top-0 translate-x-1/2 -translate-y-1/2"></div>
+			<div class="grid gap-8 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+				<div>
+					<div class="mono mb-2 text-xs tracking-widest text-[#666]">// OVERALL</div>
+					<div class="text-6xl font-bold tracking-tight md:text-7xl">30</div>
+					<div class="mt-1 text-lg text-[#666]">/ 60</div>
+					<div class="mt-4 inline-flex border border-[#f43f5e]/30 bg-[#f43f5e]/10 px-3 py-1 text-sm text-[#f43f5e]">BLOCK</div>
+				</div>
+				<div>
+					<div class="mono mb-3 text-xs tracking-widest text-[#666]">// TL;DR</div>
+					<p class="text-sm leading-6 text-[#a0a0a0]">The visual system is the strongest part of this page and it is doing real work: one deliberate era, one accent used three times, square corners held throughout, and motion that keeps the form readable at paint. It does not look assembled from defaults.</p>
+					<p class="mt-4 text-sm leading-6 text-[#fbbf24]">Two things stop it being shippable: the primary button does nothing, and the placeholder text is too faint. Both are small fixes, neither is a direction problem. Fix findings 1 and 2, then re-run checkup.</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="report-section mb-8 p-6 md:p-8">
+			<div class="mono mb-6 text-xs tracking-widest text-[#666]">// HEURISTIC SCORES</div>
+			<div class="overflow-x-auto">
+				<table class="w-full min-w-[720px] border-collapse text-sm">
+					<thead>
+						<tr class="border-b border-[#222226] text-left mono text-xs text-[#666]">
+							<th class="py-3 pr-4 font-normal">#</th>
+							<th class="py-3 pr-4 font-normal">HEURISTIC</th>
+							<th class="py-3 pr-4 font-normal">SCORE</th>
+							<th class="py-3 pr-4 font-normal">STATUS</th>
+							<th class="py-3 font-normal">KEY FINDING</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="border-b border-[#1a1a1e]">
+							<td class="py-4 pr-4 text-[#555]">1</td>
+							<td class="py-4 pr-4 text-[#fafafa]">Intentionality</td>
+							<td class="py-4 pr-4 text-[#fbbf24]">5 / 10</td>
+							<td class="py-4 pr-4 mono text-xs text-[#fbbf24]">WATCH</td>
+							<td class="py-4 text-[#a0a0a0]">Real token system, but two dead colour tokens and one documented radius that does not exist</td>
+						</tr>
+						<tr class="border-b border-[#1a1a1e]">
+							<td class="py-4 pr-4 text-[#555]">2</td>
+							<td class="py-4 pr-4 text-[#fafafa]">Readability</td>
+							<td class="py-4 pr-4 text-[#f43f5e]">0 / 10</td>
+							<td class="py-4 pr-4 mono text-xs text-[#f43f5e]">CRITICAL</td>
+							<td class="py-4 text-[#a0a0a0]">Placeholder text measures 2.77:1 against its own field</td>
+						</tr>
+						<tr class="border-b border-[#1a1a1e]">
+							<td class="py-4 pr-4 text-[#555]">3</td>
+							<td class="py-4 pr-4 text-[#fafafa]">Usability</td>
+							<td class="py-4 pr-4 text-[#f43f5e]">0 / 10</td>
+							<td class="py-4 pr-4 mono text-xs text-[#f43f5e]">CRITICAL</td>
+							<td class="py-4 text-[#a0a0a0]">The primary action is inert. Click and Enter both change nothing</td>
+						</tr>
+						<tr class="border-b border-[#1a1a1e]">
+							<td class="py-4 pr-4 text-[#555]">4</td>
+							<td class="py-4 pr-4 text-[#fafafa]">Responsiveness</td>
+							<td class="py-4 pr-4 text-[#34d399]">10 / 10</td>
+							<td class="py-4 pr-4 mono text-xs text-[#34d399]">HEALTHY</td>
+							<td class="py-4 text-[#a0a0a0]">No overflow at 320px or 200% zoom. Field is 16px, so iOS will not zoom</td>
+						</tr>
+						<tr class="border-b border-[#1a1a1e]">
+							<td class="py-4 pr-4 text-[#555]">5</td>
+							<td class="py-4 pr-4 text-[#fafafa]">Speed</td>
+							<td class="py-4 pr-4 text-[#34d399]">10 / 10</td>
+							<td class="py-4 pr-4 mono text-xs text-[#34d399]">HEALTHY</td>
+							<td class="py-4 text-[#a0a0a0]">189ms load, zero console errors, fonts self-hosted</td>
+						</tr>
+						<tr>
+							<td class="py-4 pr-4 text-[#555]">6</td>
+							<td class="py-4 pr-4 text-[#fafafa]">Accessibility</td>
+							<td class="py-4 pr-4 text-[#fbbf24]">5 / 10</td>
+							<td class="py-4 pr-4 mono text-xs text-[#fbbf24]">WATCH</td>
+							<td class="py-4 text-[#a0a0a0]">Keyboard path works and the ring lands correctly, but it starts invisible for about 150ms</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</section>
+
+		<section class="report-section mb-8 p-6 md:p-8">
+			<div class="mono mb-6 text-xs tracking-widest text-[#666]">// SIGNALS</div>
+			<div class="grid gap-6 md:grid-cols-2">
+				<div>
+					<div class="mb-3 text-xl font-semibold">Mixed, leaning sound</div>
+					<ul class="space-y-3 text-sm text-[#a0a0a0]">
+						<li><span class="mono mr-2 text-[#34d399]">PASS</span>No horizontal overflow at 320px or at 200% zoom</li>
+						<li><span class="mono mr-2 text-[#34d399]">PASS</span>Reduced motion removes the entrance animation entirely</li>
+						<li><span class="mono mr-2 text-[#34d399]">PASS</span>Keyboard reaches both controls, ring is 2px at 3px offset</li>
+						<li><span class="mono mr-2 text-[#fbbf24]">WATCH</span>Button focus ring starts at 1.00:1, reaches orange at 260ms</li>
+						<li><span class="mono mr-2 text-[#f43f5e]">FAIL</span>Primary button has no handler at all</li>
+						<li><span class="mono mr-2 text-[#f43f5e]">FAIL</span>Placeholder text at 2.77:1, needs 4.5:1</li>
+					</ul>
+				</div>
+				<div>
+					<div class="mono mb-3 text-xs tracking-widest text-[#666]">// NEXT MODES</div>
+					<div class="flex flex-wrap gap-2">
+						<span class="border border-[#333] px-3 py-1 text-sm text-[#a0a0a0]">/design interaction</span>
+						<span class="border border-[#333] px-3 py-1 text-sm text-[#a0a0a0]">/design a11y</span>
+						<span class="border border-[#333] px-3 py-1 text-sm text-[#a0a0a0]">/design relayout</span>
+					</div>
+					<p class="mt-4 text-sm leading-6 text-[#666]">Report modes do not fix. Run one of these to apply the findings above.</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="report-section mb-8 p-6 md:p-8">
+			<div class="mono mb-6 text-xs tracking-widest text-[#666]">// PRIORITY ISSUES</div>
+			<div class="space-y-5">
+				<article class="border border-[#2a1d22] bg-[#110b0d] p-5">
+					<div class="mono mb-2 text-xs text-[#f43f5e]">HIGH &middot; INTERACTION &middot; app/page.tsx:100</div>
+					<h2 class="mb-2 text-lg font-semibold">The primary button does nothing</h2>
+					<p class="mb-4 text-sm leading-6 text-[#a0a0a0]">The button is fully styled and enabled. Clicking it, and pressing Enter on it, leave the counts at <span class="mono text-[#fafafa]">0 0 0</span> and the DOM unchanged. The placeholder shows three real codes, so a visitor has every reason to click.</p>
+					<div class="border-l border-[#fbbf24] pl-4 text-sm leading-6 text-[#fbbf24]">FIX: Wire it to the decoder when that slice lands. Until then render it disabled with the label naming what is missing, so the page never promises an action it cannot perform.</div>
+				</article>
+
+				<article class="border border-[#2a1d22] bg-[#110b0d] p-5">
+					<div class="mono mb-2 text-xs text-[#f43f5e]">HIGH &middot; COLOR &middot; app/page.tsx:82</div>
+					<h2 class="mb-2 text-lg font-semibold">Placeholder text is too faint to read</h2>
+					<p class="mb-4 text-sm leading-6 text-[#a0a0a0]"><span class="mono text-[#fafafa]">placeholder:text-ink-muted/60</span> composites to <span class="mono text-[#fafafa]">rgb(157 153 147)</span> on <span class="mono text-[#fafafa]">rgb(253 252 251)</span>, measured at <span class="mono text-[#f43f5e]">2.77:1</span>. Body text needs 4.5:1. Measured from rendered pixels, not estimated.</p>
+					<div class="border-l border-[#fbbf24] pl-4 text-sm leading-6 text-[#fbbf24]">FIX: Drop the <span class="mono">/60</span> so the placeholder uses the full <span class="mono">--color-ink-muted</span> token, which measures 6.65:1.</div>
+				</article>
+
+				<article class="border border-[#1f1f24] p-5">
+					<div class="mono mb-2 text-xs text-[#fbbf24]">MEDIUM &middot; ACCESSIBILITY &middot; app/page.tsx:96</div>
+					<h2 class="mb-2 text-lg font-semibold">The button focus ring starts invisible</h2>
+					<p class="mb-4 text-sm leading-6 text-[#a0a0a0]"><span class="mono text-[#fafafa]">transition-colors</span> includes <span class="mono text-[#fafafa]">outline-color</span>. Sampled at 0ms the ring is paper on paper at 1.00:1, at 60ms it is part way, and it only reaches orange at 260ms. A keyboard user tabbing quickly sees no ring.</p>
+					<div class="border-l border-[#fbbf24] pl-4 text-sm leading-6 text-[#fbbf24]">FIX: Transition only the properties the hover needs, e.g. <span class="mono">transition-[background-color,border-color]</span>, so the ring paints immediately.</div>
+				</article>
+
+				<article class="border border-[#1f1f24] p-5">
+					<div class="mono mb-2 text-xs text-[#fbbf24]">MEDIUM &middot; LAYOUT &middot; app/page.tsx:18-19</div>
+					<h2 class="mb-2 text-lg font-semibold">The tool sits below the fold on a laptop</h2>
+					<p class="mb-4 text-sm leading-6 text-[#a0a0a0]">At 1440 by 900 the paste box starts at 771px, leaving only 52 percent of it visible. A first-time visitor sees a poster and a specimen spec, then must scroll to find the thing they came for.</p>
+					<div class="border-l border-[#fbbf24] pl-4 text-sm leading-6 text-[#fbbf24]">FIX: Trim the hero so the field starts above roughly 640px, by reducing the top padding and the large headline step.</div>
+				</article>
+
+				<article class="border border-[#1f1f24] p-5">
+					<div class="mono mb-2 text-xs text-[#fbbf24]">MEDIUM &middot; TYPE &middot; globals.css:24 vs design-system.md:72</div>
+					<h2 class="mb-2 text-lg font-semibold">One documented token does not exist in the code</h2>
+					<p class="mb-4 text-sm leading-6 text-[#a0a0a0]">The design system lists <span class="mono text-[#fafafa]">--radius-md: 3px</span>. That token is absent from the <span class="mono text-[#fafafa]">@theme</span> block and resolves to Tailwind's default <span class="mono text-[#fafafa]">.375rem</span>. A design system that is wrong in one row is worse than one that documents less.</p>
+					<div class="border-l border-[#fbbf24] pl-4 text-sm leading-6 text-[#fbbf24]">FIX: Either add <span class="mono">--radius-md: 3px</span> to the theme block or delete the row.</div>
+				</article>
+
+				<article class="border border-[#1f1f24] p-5">
+					<div class="mono mb-2 text-xs text-[#666]">LOW &middot; TYPE &middot; globals.css:9-12</div>
+					<h2 class="mb-2 text-lg font-semibold">Two colour tokens are declared and never used</h2>
+					<p class="mb-4 text-sm leading-6 text-[#a0a0a0]"><span class="mono text-[#fafafa]">--color-phosphor</span> and <span class="mono text-[#fafafa]">--color-phosphor-dim</span> have no reference anywhere in the page. They imply a dark instrument palette the design does not use.</p>
+					<div class="border-l border-[#666] pl-4 text-sm leading-6 text-[#a0a0a0]">FIX: Delete both, or build the dark readout panel they were meant for.</div>
+				</article>
+
+				<article class="border border-[#1f1f24] p-5">
+					<div class="mono mb-2 text-xs text-[#666]">LOW &middot; TYPE &middot; app/page.tsx:41</div>
+					<h2 class="mb-2 text-lg font-semibold">Block labels sit at the edge of legibility</h2>
+					<p class="mb-4 text-sm leading-6 text-[#a0a0a0]">The six CIN block labels render at 9px uppercase with 0.16em tracking. Contrast passes, but tracked uppercase at that size is hard work on a laptop.</p>
+					<div class="border-l border-[#666] pl-4 text-sm leading-6 text-[#a0a0a0]">FIX: Raise to 11px to match the other legend, or reduce tracking to 0.12em.</div>
+				</article>
+			</div>
+		</section>
+
+		<section class="report-section mb-8 p-6 md:p-8">
+			<div class="mono mb-6 text-xs tracking-widest text-[#666]">// WHAT'S WORKING</div>
+			<div class="grid gap-4 md:grid-cols-3">
+				<article class="border border-[#1f1f24] p-4">
+					<h2 class="mb-2 text-sm font-semibold">One era, held</h2>
+					<p class="text-sm leading-6 text-[#a0a0a0]">Cream stock, two colour press, square corners, ruled printout lines. Nothing on the page contradicts the premise.</p>
+				</article>
+				<article class="border border-[#1f1f24] p-4">
+					<h2 class="mb-2 text-sm font-semibold">Accent discipline</h2>
+					<p class="text-sm leading-6 text-[#a0a0a0]">Orange appears three times: one word in the headline, the button hover, the focus ring. It means something because it is rare.</p>
+				</article>
+				<article class="border border-[#1f1f24] p-4">
+					<h2 class="mb-2 text-sm font-semibold">Motion with a rule</h2>
+					<p class="text-sm leading-6 text-[#a0a0a0]">Only the headline, prose and specimen animate. The form has no entrance animation, so the tool is readable at paint. Reduced motion is honoured.</p>
+				</article>
+				<article class="border border-[#1f1f24] p-4">
+					<h2 class="mb-2 text-sm font-semibold">Real text hierarchy</h2>
+					<p class="text-sm leading-6 text-[#a0a0a0]">76px poster, 18px body at 60ch, 11px legends, tabular numerals. Clear separation between every step.</p>
+				</article>
+				<article class="border border-[#1f1f24] p-4">
+					<h2 class="mb-2 text-sm font-semibold">Honest copy</h2>
+					<p class="text-sm leading-6 text-[#a0a0a0]">"A valid format is not a real company. Only MCA can confirm that." The most valuable line on the page.</p>
+				</article>
+				<article class="border border-[#1f1f24] p-4">
+					<h2 class="mb-2 text-sm font-semibold">No reflexes</h2>
+					<p class="text-sm leading-6 text-[#a0a0a0]">No gradients to speak of, no cards, no pills, no shadows, no emoji, no reflex fonts, no blanket scroll reveal.</p>
+				</article>
+			</div>
+		</section>
+
+		<section class="report-section mb-8 p-6 md:p-8">
+			<div class="mono mb-6 text-xs tracking-widest text-[#666]">// VERIFICATION</div>
+			<div class="grid gap-6 md:grid-cols-2">
+				<div>
+					<div class="mono mb-3 text-xs tracking-widest text-[#34d399]">RUN AND OBSERVED</div>
+					<ul class="space-y-2 text-sm leading-6 text-[#a0a0a0]">
+						<li>check.mjs: 0 FAIL, 0 WARN, 8 oklch, 0 hex. It did not read the .tsx files, so component contrast was measured in the rendered page</li>
+						<li>Load 189ms, 0 console errors, 0 page errors</li>
+						<li>Contrast from computed styles: heading 15.73:1, prose 6.65:1, button 13.76:1, field 15.73:1</li>
+						<li>Placeholder composited from pixels: 2.77:1</li>
+						<li>Tab order textarea then button, both reach focus-visible</li>
+						<li>Ring sampled at 0, 60, 260, 760ms</li>
+						<li>Click and Enter on the button: no change</li>
+						<li>320px no overflow, 200% no overflow, field 16px</li>
+						<li>Reduced motion: animation-name none</li>
+					</ul>
+				</div>
+				<div>
+					<div class="mono mb-3 text-xs tracking-widest text-[#666]">NOT VERIFIED</div>
+					<ul class="space-y-2 text-sm leading-6 text-[#a0a0a0]">
+						<li>Screen reader announcements, since nothing is dynamic yet</li>
+						<li>Real iOS and Android devices. Widths were simulated</li>
+						<li>RTL, which this product does not support</li>
+					</ul>
+				</div>
+			</div>
+		</section>
+
+		<footer class="mono py-8 text-center text-xs tracking-widest text-[#444]">
+			Generated with CommandCode - 26 November 2026
+		</footer>
+	</main>
+</body>
+</html>
