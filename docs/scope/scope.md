@@ -11,7 +11,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 
 | # | Feature | Phase | Status |
 |---|---------|-------|--------|
-| 1 | Stack & architecture | Foundation | planned |
+| 1 | Stack & architecture | Foundation | in-progress |
 | 2 | Coding standards & tooling | Foundation | planned |
 | 3 | Decode rules & reference data | Foundation | planned |
 | 4 | Design system & UI foundation | Foundation | planned |
@@ -25,10 +25,13 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 
 ## Foundations
 
-### 1. Stack & architecture · needs a decision
+### 1. Stack & architecture · in-progress
 Decide how the page is built and scaffold a runnable project so every later slice stands on real structure. One decision worth defending out loud: this page needs no server and no database, because the answer is fully determined by the text the visitor pastes, so a static build answers in under a millisecond, works on any free host, and lets you say honestly that nothing pasted ever leaves the browser.
 **Done when:** the spec records the stack and the "no server, no database" call with its reasoning, and the empty scaffold boots locally and passes a production build.
-- [ ] Decide the stack (spec): `/architect stack & architecture`
+- [x] Decide the stack (spec): `/architect stack & architecture`
+- [ ] Scaffold from the decision: `/develop stack & architecture`
+- [ ] Verify it: `/check verify stack & architecture`
+Spec 0001 · code (filled by /develop)
 
 ### 2. Coding standards & tooling
 Capture the conventions the assignment is judged on (readable code you can explain simply) and install the guards so every later file follows them, from the real scaffold.
