@@ -125,30 +125,42 @@ They said they will paste tricky input. Be ready for these:
 | Decision | Why we chose it |
 |---|---|
 | No server and no database | The answer depends only on the text pasted. A server adds a round trip, a thing that can break, and an awkward question: "does my client's CIN leave my machine?" A static page answers in under a millisecond and lets us promise nothing is sent anywhere |
-| Still use Next.js | Because you wanted that stack. It can build to plain static files and deploy on Vercel, so you get the framework without running a server |
+| Next.js 16 with static export | Because you wanted that stack. `output: 'export'` emits plain HTML, CSS and JS files, so you get the framework without running a server. Both routes build as static, which the build output proves |
+| TypeScript in strict mode | The decoded result has six fields and many error reasons. Types catch a mistyped field before you even open the page, and in the video you can say a typo becomes a build error, not a silent bug |
+| Tailwind CSS v4 with `@theme` tokens | One visible place holds spacing, type and colour. v4 keeps tokens in CSS rather than a config file, which is what current shadcn/ui expects |
+| shadcn/ui retuned to FileSure | Accessible primitives with real focus and keyboard behaviour, skinned so it belongs on filesure.in rather than looking like every other shadcn site |
+| motion, imported from `motion/react` | Purpose built React animation with a real reduced motion path. The old `framer-motion` name still works but the docs recommend moving off it |
+| Decode rules in one pure module, no React | The rules can be tested in plain Node, which is where the reviewer's tricky inputs land. This is the single most important structural decision |
 | Cards for short lists, table for long ones | Cards read best for one to ten codes. A table survives 500 lines. Best experience, at the cost of designing two layouts |
 | Counts plus a "show broken only" filter | This is what makes a 500 line paste actually usable instead of a wall of text |
 | Download as CSV | A chartered accountant works in a spreadsheet. This is the difference between a toy and a tool |
-| Shareable link | One extra way to be useful, with a cap so long lists never make a broken link |
-| Match FileSure's own look | The brief says design it as if it goes live on filesure.in tomorrow. Looking like their site argues the page already belongs there |
-| Put count of valid, invalid, LLP at the top | So a person scanning 500 results knows the shape of the answer before reading any row |
-| Build approach: Skateboard | Ship the smallest complete thing that is genuinely usable, then grow it. One day deadline on one page. No point building layers first |
+| Share link uses the URL hash, not the query string | A hash never leaves the browser. In the query string, pasted codes would travel to the host and land in server logs, which would break the privacy promise |
+| Match FileSure's own look | The brief says design it as if it goes live on filesure.in tomorrow |
+| Build approach: Skateboard | Ship the smallest complete thing that is genuinely usable, then grow it. One day deadline on one page |
 | Workflow: Alpha, decoder tested | Most features only get a check that they really work. The decoder alone gets a real test suite, because that is where their tricky inputs land |
-| Sources recorded and links checked | So every rule in the plan can be defended in the interview. Five links were actually fetched and confirmed, not guessed |
+| Vitest is a gate, Playwright is not | Vitest proves the rules and blocks a broken build. Playwright proves the page in a real browser, and is the first thing to cut if time runs short |
+| Sources recorded and links checked | So every rule in the plan can be defended in the interview. The links were actually fetched, not guessed |
+
+### The stack in one sentence, for the interview
+
+> "It is a static Next.js site in TypeScript. The decode rules are a pure module with no React in them, which is why they have real unit tests. Tailwind and shadcn give it an accessible component base, and it builds to plain files, so there is no server and nothing you paste ever leaves the browser."
 
 ---
 
 ## 8. What we do next, in order
 
-1. `/architect stack & architecture` to decide the stack and write it down.
-2. Scaffold the project, then capture coding standards with `/audit`.
-3. `/architect decode rules & reference data` to write the state table, type table and error messages. This is the heart.
-4. `/architect design system & UI foundation` to set the look.
-5. Build the decoder with its test suite. Get this right first.
-6. Build the page and results.
-7. Add long list handling, then CSV, then share links.
-8. Design the empty, wrong and huge states properly.
-9. Deploy, export transcripts, record the video, send the email.
+Done already: the stack is decided in `docs/specs/0001` and the app is scaffolded. The build passes, both routes prerender to static HTML, typecheck and lint are clean.
+
+Still to do, in this order:
+
+1. `/audit` to capture the coding conventions and install the guards, so every later file follows the same rules.
+2. `/architect decode rules & reference data` to write the state table, type table and error messages. This is the heart of the whole thing.
+3. `/architect design system & UI foundation` to set the look, ideally after running `/design variants` so the FileSure retune is a real choice.
+4. Build the decoder with its test suite. Get this right before touching the page.
+5. Build the page and results.
+6. Add long list handling, then CSV, then share links.
+7. Design the empty, wrong and huge states properly.
+8. Deploy, export transcripts, record the video, send the email.
 
 The full plan with all 11 features lives in `docs/scope/scope.md`.
 

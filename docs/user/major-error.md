@@ -13,6 +13,22 @@ Add to this file while you build. Do not tidy it later.
 
 ## Caught already
 
+### E4. npm silently skipped every dev dependency
+
+**What happened.** After scaffolding, `npm install` reported success and added only 22 packages. Tailwind, TypeScript and ESLint were all missing.
+
+**Why it happened.** The shell had `NODE_ENV=production` set, and npm treats that as an instruction to skip dev dependencies. So `npm install` did exactly what it was told, and reported "added 22 packages" as a success.
+
+**Why it matters.** This is the strongest kind of AI mistake to show, because nothing errored. The output looked like a pass. If the next step had been "build the page" instead of "verify the build", the failure would have surfaced much later as a confusing missing module error, or worse, the dev server would have run while the production build was silently broken. A confident "installed successfully" was factually true and completely misleading.
+
+**How it was caught.** By not trusting the success message. `ls node_modules` showed 18 folders, which is far too few for a Next.js project. A check for `node_modules/tailwindcss` failed. Then `echo $NODE_ENV` printed `production` and the cause was obvious.
+
+**The fix.** `NODE_ENV=development npm install --include=dev`, which added all 337 packages.
+
+**Lesson.** A success exit code only proves the command did what it was told. It never proves it did what you wanted. Count the result and check for the specific thing you need, rather than reading the summary line.
+
+---
+
 ### E1. Asked for a model name that does not exist
 
 **What happened.** When setting up a background helper to verify reference links, the request named a model as `haiku`.

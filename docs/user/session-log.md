@@ -12,6 +12,56 @@ Each entry keeps the same shape:
 
 ---
 
+## Session 3: Scaffolded the app
+
+**Date:** 26 November 2026
+**Branch:** `main`, in sync with `origin/main`
+
+### Goal
+
+Create the real project from spec `0001`: Next.js 16 with static export, TypeScript, Tailwind v4, and prove it builds and runs.
+
+### Did
+
+1. Checked the tree was clean and in sync with the remote before touching anything.
+2. Checked the scaffold flags first with `--help` rather than guessing, since Next 16 renamed and added several.
+3. `create-next-app` refused to scaffold in place because `extra/` was in the way. Scaffolded into a temp folder and copied the generated files in, keeping the existing git repo and docs.
+4. Configured `next.config.ts` for `output: "export"` and `images: { unoptimized: true }`. Removed the generated `cacheComponents` and `partialPrefetching` flags, which assume a server.
+5. Replaced the boilerplate home page with the checker shell, and set real page metadata.
+6. Removed the Next.js demo assets and rewrote the README around this project instead of the generated one.
+7. Proved it works: build passes, both routes prerender static, typecheck clean, lint clean, dev server returns 200 and renders with Tailwind classes live.
+8. Promoted spec `0001` to a directory spec, splitting the reasoning into `rationale.md` and adding `verify.md`.
+
+### Decisions
+
+| Decision | Reason |
+|---|---|
+| Scaffold in a temp dir, then copy in | The initializer refuses a folder containing `extra/`, and moving the docs would break the repo |
+| Removed `cacheComponents` and `partialPrefetching` | Both assume a server; static export is the whole point |
+| `images: unoptimized` | Spec decision; the default loader does not work under static export and the page ships no photos |
+| One client island, page stays a Server Component | Keeps the shell as real HTML, which is what a stranger sees first |
+| Kept Geist via `next/font` | Self hosted, no runtime CDN request, and it is the current Next.js default |
+
+### Errors and corrections
+
+- **`NODE_ENV=production` in this shell made npm skip every dev dependency.** The first install added only 22 packages, so Tailwind, TypeScript and ESLint were missing. Caught it by listing `node_modules` and checking `echo $NODE_ENV`. Fixed with `NODE_ENV=development npm install --include=dev`. This is a real catch and a good candidate for the video, since a less careful run would have reported success and then failed at build time.
+- The scaffold's `.gitignore` overwrote mine, which briefly un ignored `extra/`. Restored it and added the Playwright output folders in the same pass.
+- Typo caught while writing the error log: "Telegana" in `major-error.md`, fixed to "Telangana".
+
+### Left over
+
+- Feature 1 is `in-progress`, not `done`. The scaffold landed but `Verify it` is unticked.
+- `AGENTS.md` holds only the Next.js generated warning note about breaking changes. `/audit` should seed the real conventions next.
+- The checker itself, the decode rules and the design system are all still to come.
+
+### Git
+
+- Commit `c53dd3f`: Scaffold the static Next.js app from spec 0001.
+- Commit `0957dc2`: Split spec 0001 into a directory spec with verify steps.
+- Both pushed, tree clean.
+
+---
+
 ## Session 2: Chose the stack
 
 **Date:** 26 November 2026
