@@ -31,7 +31,7 @@ Decide how the page is built and scaffold a runnable project so every later slic
 - [x] Decide the stack (spec): `/architect stack & architecture`
 - [x] Scaffold from the decision: `/develop stack & architecture`
 - [ ] Verify it: `/check verify stack & architecture`
-Spec 0001 · code in `app/`, `next.config.ts`
+Spec [0001](../specs/0001-static-web-stack-for-cin-checker/index.md) · code in `app/`, `next.config.ts`
 
 ### 2. Coding standards & tooling
 Capture the conventions the assignment is judged on (readable code you can explain simply) and install the guards so every later file follows them, from the real scaffold.

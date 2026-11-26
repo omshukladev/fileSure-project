@@ -1,55 +1,21 @@
 # 0001. Build the CIN checker as a static single page on Next.js
 
 **Date**: 2026-11-26
-**Status**: Accepted
+**Status**: In Progress
 
 ## Summary
 
 The page is built as one static site with Next.js and TypeScript, styled with Tailwind CSS v4, using shadcn/ui components retuned to FileSure's own look, and animated with the motion package. It ships as plain HTML, CSS and JavaScript files with no server and no database, because every answer can be computed from the text the visitor pastes. The decode rules live in one pure TypeScript module covered by Vitest, and a Playwright test drives the real built page the way a reviewer would.
 
-## Context
+## Requirements
 
-The product is one public page. A chartered accountant, a lawyer or a business owner pastes a list of company and LLP identifiers, and the page explains what each one means. There is no login, no saved state and no personal data. Every answer is a pure function of the pasted text.
+This is an architecture decision, so there are no product acceptance criteria here. The contract is the stack itself, and the feature that executes it (the scaffold) is verified against these:
 
-That fact drives the whole decision. Because the answer never needs the network, a server would add a round trip, a runtime that can fail, and an awkward question from a cautious professional: does my client's identifier leave my machine? A static page answers in under a millisecond, works on any free host, and lets us promise that nothing pasted is ever sent anywhere.
-
-The audience is non technical and time pressured, working from client files, often on a phone. The assignment judges design as heavily as code, names an empty state, a wrong input and a 500 line paste as specific states it will inspect, and says the page should look as if it went live on filesure.in tomorrow. So the build needs a real component base and a real visual system, not hand rolled widgets.
-
-The deadline is one day, and the same person must later record a ten minute video walking through the code, then make a live change to the page while an interviewer watches. Readability of the code and the ability to explain it simply are therefore part of the technical requirement, not a nice extra.
-
-## Options considered
-
-### Option 1: Next.js with static export, React 19, Tailwind v4, shadcn/ui, motion
-
-One Next.js app using the App Router, built with `output: 'export'` so it emits a folder of plain files. React components for the interactive parts. Tailwind v4 for the visual system, shadcn/ui for accessible primitives copied into the repo, motion for animation.
-
-**Pros**: shadcn/ui supports Next.js officially and is the most common pairing a reviewer will recognise. Static export means no server, so the deployment is plain files on any host. Server Components still render at build time, so the page arrives as real HTML rather than a blank shell. TypeScript catches a whole class of mistakes in the decode logic.
-
-**Cons**: Next.js is more machinery than one page strictly needs. Export mode has real limits: Server Actions, cookies, headers, redirects, rewrites, middleware and ISR are all unavailable, and the default image loader does not work. shadcn/ui's own install guide never mentions static export, so that pairing is inferable rather than documented, though its components are ordinary client components and work fine.
-
-### Option 2: React with Vite, Tailwind v4, shadcn/ui, motion
-
-The same React components and the same visual system, with Vite as the build tool and no routing framework.
-
-**Pros**: Much lighter, faster cold start, fewer moving parts, and shadcn/ui supports Vite officially. The output is also plain files.
-
-**Cons**: The engine wanted Next.js, and Vite offers no story about a future backend route. It also gives up build time rendering, so the first paint is closer to an empty page unless the shell is hand written.
-
-### Option 3: Astro with React islands
-
-Astro renders the page to static HTML by default and hydrates only the interactive box.
-
-**Pros**: The smallest JavaScript payload of the three, and it is genuinely designed for content pages that need a little interactivity.
-
-**Cons**: The interactive surface here is the whole point of the page, so most of it ends up as a client island anyway. shadcn/ui on Astro is a less travelled path, and a reviewer who asked for Next.js sees an unexplained detour. Extra setup cost on a one day deadline.
-
-### Option 4: One hand written HTML file with vanilla JavaScript
-
-No framework, no build step, one file deployed as is.
-
-**Pros**: Nothing to configure, nothing to break, instant to host, and trivially explainable in a video.
-
-**Cons**: The reported criteria include layout, typography, spacing and a phone layout judged as if it were a production product. Hand rolling a component system with proper focus, keyboard and screen reader behaviour on a single day is slower than using one, and the result is very likely worse. No type safety in the decoder, no test tooling without adding a build anyway.
+- **AC-1**: the project builds with `npm run build` and emits a static `out/` folder containing real HTML.
+- **AC-2**: no server runtime is required to serve the built site; a plain static file server is enough.
+- **AC-3**: `npm run typecheck` and `npm run lint` both pass with no errors.
+- **AC-4**: `app/page.tsx` renders as a Server Component, and no interactive state exists outside a `'use client'` boundary.
+- **AC-5**: no database, no auth, and no analytics dependency is installed.
 
 ## Decision
 
@@ -58,14 +24,6 @@ No framework, no build step, one file deployed as is.
 Build one static Next.js app in TypeScript, emitted as plain files with `output: 'export'`, deployed on Vercel. Decode logic is a pure module with no React in it. shadcn/ui provides accessible primitives, retuned to FileSure's palette and type. Motion is added through the motion package, respecting reduced motion.
 
 **Implementation skills**: `design` (built in Command Code skill, `~/.npm-global/lib/node_modules/command-code/dist/bundled/design/`) · `frontend-design` (`~/.agents/skills/frontend-design/`) · `web-design-guidelines` (`~/.agents/skills/web-design-guidelines/`) · `tailwind-4-docs` (`~/.agents/skills/tailwind-4-docs/`) · `ui-ux-pro-max` (`~/.agents/skills/ui-ux-pro-max/`)
-
-## Rationale
-
-Option 1 is chosen because two of the engineer's stated wishes meet in it without a fight: Next.js was already wanted, and shadcn/ui supports it officially with Tailwind v4. Static export removes the server entirely, so the honest privacy claim survives while the framework stays.
-
-Option 2 is the technically leaner choice and would ship the same page. It is rejected on two grounds: it abandons the engine's stated stack, and it gives up build time rendering for a page a stranger must understand in seconds. Option 3 is the better answer if the product were mostly text with a small interactive part, which it is not. Option 4 is rejected because the design is graded against a production site, and hand built accessibility under time pressure is where that grade is usually lost.
-
-One tension accepted deliberately: the engineer asked for bold, showy motion, while the audience is conservative and the brief judges clarity. Motion is therefore allowed to be expressive on arrival, hover and reveal, but it must never delay a result becoming readable and must never be the only carrier of meaning.
 
 ## Proposed stack
 
@@ -80,7 +38,7 @@ One tension accepted deliberately: the engineer asked for bold, showy motion, wh
 | Domain logic | One pure TypeScript module, no React imports | Makes the decoder testable in plain Node, and keeps logic out of the view |
 | Unit testing | Vitest, Node environment | The decoder is pure functions, so no DOM is needed and the suite stays fast |
 | Browser testing | Playwright against the built static output | Tests what actually ships, not the dev server |
-| Build and checks | npm, ESLint, Prettier, `tsc --noEmit`, GitHub Actions on push | A green tick in the repo is visible proof to a reviewer, and it catches breakage before deploy |
+| Build and checks | npm, ESLint, `tsc --noEmit`, GitHub Actions on push | A green tick in the repo is visible proof to a reviewer, and it catches breakage before deploy |
 | Hosting | Vercel free tier | Built by the Next.js team, so static export needs no fighting to deploy |
 | Analytics and tracking | None | Any analytics would contradict the promise that nothing pasted leaves the browser |
 | Primary DB | None | Every answer is derived from the input; there is nothing to store |
@@ -150,7 +108,6 @@ The engineer asked for bold motion. It is capped here so the showy request never
 
 Rules that hold across the table: animate `transform` and `opacity` only, never `width` or `height`. `useReducedMotion()` returns true, every entry collapses to a 100ms opacity fade with no travel and no stagger. Animation never delays a result becoming readable, and no state is communicated by motion alone.
 
-
 ## Consequences
 
 **Positive**:
@@ -174,33 +131,10 @@ Rules that hold across the table: animate `transform` and `opacity` only, never 
 ## Follow-up
 
 - [ ] The design direction is settled by running the built in `/design variants` comparison before building the page, so the FileSure retune is a choice made against real options rather than an assumption. Retuning shadcn's default look to FileSure's is real design work, not a colour swap, and skipping it leaves a generic looking page.
-- [ ] `lib/reference/` is created empty by the scaffold and owned by spec 0003. Do not fill the tables here; this spec only decides where they live.
+- [ ] `lib/reference/` is created by spec 0003, not here. Do not fill the tables in this feature; this spec only decides where they live.
 - [ ] Record one real instance of the AI getting something wrong during the build in `docs/user/major-error.md`, for the video requirement.
-- [ ] `AGENTS.md` does not exist yet. `/audit` seeds it from the real scaffold, and the stack, styling and motion conventions belong in its `## Rules` because they reach every file.
+- [ ] `AGENTS.md` currently only holds the Next.js generated note. `/audit` seeds the real conventions from the scaffold, and the stack, styling and motion rules belong in its `## Rules`.
 
-## References
+## Rationale
 
-**Project sources** (verifiable, in this repo):
-- `docs/scope/scope.md`, feature 1 Stack and architecture, and the project header recording the Skateboard approach and the Alpha workflow tier.
-- `extra/filesure_tech_assignment.txt`, the brief: the six decoded fields, the three judged states, the four submission items, and the score on design, layout, typography, spacing, colour and phone use.
-- `docs/user/briefing.md`, the recorded reasoning behind the no server and no database call.
-
-**Practices & standards**:
-- Static first for pure functions: when every output is determined by an input already in the browser, a backend adds operational risk with no capability, and the strongest privacy claim is the one with no upload path at all.
-- Separate the domain core from the view, so business rules are testable without a browser and the view can change shape without touching logic.
-- Foundations before features, and the smallest usable whole first, which is the recorded Skateboard approach this spec serves.
-- Progressive enhancement of motion: animate transform and opacity only, and honour the reduced motion preference.
-- WCAG 2.2 AA as the accessibility floor, including a live region so results are announced rather than silently appearing.
-
-**Links** (web verified during this run):
-- Next.js, How to create a static export: https://nextjs.org/docs/app/guides/static-exports
-- Next.js 16 upgrade guide (the breaking changes): https://nextjs.org/docs/app/guides/upgrading/version-16
-- shadcn/ui, Next.js installation: https://ui.shadcn.com/docs/installation/next
-- shadcn/ui, Tailwind v4 setup and CSS first config: https://ui.shadcn.com/docs/tailwind-v4
-- Tailwind CSS, theme configuration through `@theme`: https://tailwindcss.com/docs/theme
-- Tailwind CSS, Next.js installation: https://tailwindcss.com/docs/installation/framework-guides/nextjs
-- Motion for React: https://motion.dev/docs/react
-- Playwright, the `webServer` option: https://playwright.dev/docs/test-webserver
-- Vercel terms (the Hobby fair use limit): https://vercel.com/legal/terms
-
-Package versions confirmed against the npm registry on 2026-11-26: next 16.4.6, react 19.3.1, tailwindcss 4.3.5, motion 14.14.0, vitest 5.1.2, @playwright/test 1.65.1.
+Reasoning, the options weighed and the sources: see [rationale.md](rationale.md).
