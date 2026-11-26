@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Design system preview · FileSure CIN checker</title>
+    <style>
+      /* Values mirror app/globals.css so this file opens without a build step.
+         The product page reads the same tokens from the @theme block. */
+      :root {
+        --color-paper: oklch(0.975 0.009 85);
+        --color-ink: oklch(0.23 0.012 70);
+        --color-ink-muted: oklch(0.46 0.015 70);
+        --color-orange: oklch(0.55 0.15 42);
+        --color-rule: oklch(0.78 0.014 75);
+        --color-rule-strong: oklch(0.23 0.012 70);
+        --color-void: oklch(0.16 0.008 70);
+        --color-void-surface: oklch(0.21 0.01 70);
+        --color-void-line: oklch(0.31 0.012 70);
+        --color-void-label: oklch(0.62 0.012 75);
+        --font-display: "Archivo", system-ui, sans-serif;
+        --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+        border-radius: 0;
+      }
+
+      body {
+        margin: 0;
+        padding: 3rem 1.5rem 5rem;
+        background: var(--color-void);
+        color: oklch(0.97 0.004 85);
+        font-family: var(--font-display);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .wrap {
+        max-width: 72rem;
+        margin: 0 auto;
+      }
+
+      .mono {
+        font-family: var(--font-mono);
+      }
+
+      .section-container {
+        border: 1px solid var(--color-void-line);
+        position: relative;
+        background: var(--color-void-surface);
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .corner-box {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border: 1px solid var(--color-void-line);
+        background: var(--color-void);
+        z-index: 10;
+      }
+
+      .corner-tl {
+        top: 0;
+        left: 0;
+        transform: translate(-50%, -50%);
+      }
+
+      .corner-tr {
+        top: 0;
+        right: 0;
+        transform: translate(50%, -50%);
+      }
+
+      .section-label {
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--color-void-label);
+        margin: 0 0 1.5rem;
+      }
+
+      h1 {
+        font-size: clamp(2.5rem, 6vw, 3.75rem);
+        font-weight: 800;
+        font-stretch: 82%;
+        letter-spacing: -0.028em;
+        line-height: 0.9;
+        text-transform: uppercase;
+        margin: 0;
+      }
+
+      h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0 0 0.5rem;
+      }
+
+      .sub {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--color-void-label);
+        margin: 0.25rem 0 0;
+      }
+
+      .header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      .swatches {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+        gap: 1rem;
+      }
+
+      .swatch {
+        border: 1px solid var(--color-void-line);
+      }
+
+      .swatch-chip {
+        height: 5rem;
+      }
+
+      .swatch-meta {
+        padding: 0.625rem 0.75rem;
+        background: var(--color-void);
+      }
+
+      .swatch-name {
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin: 0;
+      }
+
+      .swatch-value {
+        font-family: var(--font-mono);
+        font-size: 0.625rem;
+        color: var(--color-void-label);
+        margin: 0.25rem 0 0;
+        word-break: break-all;
+      }
+
+      .type-row {
+        border-top: 1px solid var(--color-void-line);
+        padding: 1.25rem 0;
+      }
+
+      .type-row:first-of-type {
+        border-top: 0;
+        padding-top: 0;
+      }
+
+      .type-meta {
+        font-family: var(--font-mono);
+        font-size: 0.625rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--color-void-label);
+        margin: 0 0 0.5rem;
+      }
+
+      .specimen-poster {
+        font-weight: 800;
+        font-stretch: 82%;
+        letter-spacing: -0.028em;
+        line-height: 0.88;
+        text-transform: uppercase;
+        font-size: clamp(2rem, 4vw, 3rem);
+      }
+
+      .specimen-body {
+        font-size: 1.125rem;
+        line-height: 1.6;
+        max-width: 60ch;
+      }
+
+      .specimen-legend {
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .specimen-mono {
+        font-family: var(--font-mono);
+        font-size: 1.5rem;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .on-paper {
+        background: var(--color-paper);
+        color: var(--color-ink);
+        padding: 2rem;
+        border: 1px solid var(--color-void-line);
+      }
+
+      .on-paper .type-meta {
+        color: var(--color-ink-muted);
+      }
+
+      .paper-label {
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--color-ink-muted);
+        margin: 0 0 0.5rem;
+      }
+
+      .buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: center;
+      }
+
+      .btn {
+        font-family: var(--font-mono);
+        font-size: 0.875rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 0.75rem 1.5rem;
+        border: 2px solid var(--color-ink);
+        background: var(--color-ink);
+        color: var(--color-paper);
+        cursor: pointer;
+        transition:
+          background-color 150ms ease,
+          border-color 150ms ease;
+      }
+
+      .btn:hover {
+        background: var(--color-orange);
+        border-color: var(--color-orange);
+      }
+
+      .btn:focus-visible {
+        outline: 2px solid var(--color-orange);
+        outline-offset: 3px;
+      }
+
+      .btn-ghost {
+        background: transparent;
+        color: var(--color-ink);
+      }
+
+      .btn-ghost:hover {
+        background: var(--color-ink);
+        color: var(--color-paper);
+        border-color: var(--color-ink);
+      }
+
+      .input-demo {
+        display: block;
+        width: 100%;
+        border: 1px solid var(--color-ink);
+        background: oklch(1 0 0 / 0.7);
+        padding: 0.75rem 1rem;
+        font-family: var(--font-mono);
+        font-size: 1rem;
+        line-height: 2;
+        letter-spacing: 0.04em;
+        color: var(--color-ink);
+        background-image: repeating-linear-gradient(
+          to bottom,
+          transparent,
+          transparent 31px,
+          oklch(0.78 0.014 75 / 0.42) 31px,
+          oklch(0.78 0.014 75 / 0.42) 32px
+        );
+      }
+
+      .input-demo:focus-visible {
+        outline: 2px solid var(--color-orange);
+        outline-offset: 3px;
+      }
+
+      .readout {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+        border-top: 1px solid var(--color-rule);
+        padding-top: 1.5rem;
+      }
+
+      .readout dt {
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--color-ink-muted);
+        margin: 0 0 0.5rem;
+      }
+
+      .readout dd {
+        margin: 0;
+        font-family: var(--font-mono);
+        font-size: 1.5rem;
+        font-variant-numeric: tabular-nums;
+      }
+
+      footer {
+        text-align: center;
+        font-family: var(--font-mono);
+        font-size: 0.625rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--color-void-label);
+        padding-top: 2.5rem;
+      }
+
+      .note {
+        font-size: 0.8125rem;
+        line-height: 1.6;
+        color: var(--color-void-label);
+        margin: 0.75rem 0 0;
+        max-width: 60ch;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="section-container">
+        <div class="corner-box corner-tl"></div>
+        <div class="corner-box corner-tr"></div>
+        <div class="header-row">
+          <div>
+            <p class="section-label" style="margin-bottom: 0.25rem">
+              Design system
+            </p>
+            <h1>FileSure CIN checker</h1>
+            <p class="sub">Late 1960s data bureau · cream stock, two colour press</p>
+          </div>
+          <div style="text-align: right">
+            <p class="section-label" style="margin: 0">Tokens</p>
+            <p class="sub" style="margin: 0">26 November 2026</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-container">
+        <div class="corner-box corner-tl"></div>
+        <div class="corner-box corner-tr"></div>
+        <p class="section-label">Colour</p>
+        <div class="swatches">
+          <div class="swatch">
+            <div class="swatch-chip" style="background: var(--color-paper)"></div>
+            <div class="swatch-meta">
+              <p class="swatch-name">Paper</p>
+              <p class="swatch-value">oklch(0.975 0.009 85)</p>
+            </div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-chip" style="background: var(--color-ink)"></div>
+            <div class="swatch-meta">
+              <p class="swatch-name">Ink</p>
+              <p class="swatch-value">oklch(0.23 0.012 70)</p>
+            </div>
+          </div>
+          <div class="swatch">
+            <div
+              class="swatch-chip"
+              style="background: var(--color-ink-muted)"
+            ></div>
+            <div class="swatch-meta">
+              <p class="swatch-name">Ink muted</p>
+              <p class="swatch-value">oklch(0.46 0.015 70)</p>
+            </div>
+          </div>
+          <div class="swatch">
+            <div
+              class="swatch-chip"
+              style="background: var(--color-orange)"
+            ></div>
+            <div class="swatch-meta">
+              <p class="swatch-name">Orange</p>
+              <p class="swatch-value">oklch(0.55 0.15 42)</p>
+            </div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-chip" style="background: var(--color-rule)"></div>
+            <div class="swatch-meta">
+              <p class="swatch-name">Rule</p>
+              <p class="swatch-value">oklch(0.78 0.014 75)</p>
+            </div>
+          </div>
+        </div>
+        <p class="note">
+          Whisper strategy. Cream carries the surface, ink carries the
+          hierarchy, and orange appears three times on the page: one word in the
+          headline, the button hover, and the focus ring. Every pair measured,
+          none estimated.
+        </p>
+      </div>
+
+      <div class="section-container">
+        <div class="corner-box corner-tl"></div>
+        <div class="corner-box corner-tr"></div>
+        <p class="section-label">Typography</p>
+
+        <div class="type-row">
+          <p class="type-meta">Poster · Archivo 800, 82% width, 0.88 line height</p>
+          <div class="specimen-poster">Read any company number</div>
+        </div>
+
+        <div class="type-row">
+          <p class="type-meta">Body · Archivo 400, 1.125rem, 1.6 line height, 60ch</p>
+          <div class="specimen-body">
+            Paste a list of Indian company or LLP identifiers, one per line, and
+            this page tells you what each one means.
+          </div>
+        </div>
+
+        <div class="type-row">
+          <p class="type-meta">Legend · Plex Mono 500, 0.6875rem, 0.16em tracking</p>
+          <div class="specimen-legend">Paste your identifiers</div>
+        </div>
+
+        <div class="type-row">
+          <p class="type-meta">Readout · Plex Mono, tabular figures</p>
+          <div class="specimen-mono">019786</div>
+        </div>
+      </div>
+
+      <div class="section-container">
+        <div class="corner-box corner-tl"></div>
+        <div class="corner-box corner-tr"></div>
+        <p class="section-label">Components on paper</p>
+        <div class="on-paper">
+          <p class="paper-label">Paste your identifiers</p>
+          <input
+            class="input-demo"
+            value="L17110MH1973PLC019786"
+            aria-label="Identifier example"
+          />
+          <div class="buttons" style="margin-top: 1.25rem">
+            <button class="btn" type="button">Read the list</button>
+            <div class="btn btn-ghost" style="cursor: default">
+              Focused, press tab
+            </div>
+          </div>
+          <dl class="readout" style="margin-top: 2.5rem">
+            <div>
+              <dt>Read</dt>
+              <dd>0</dd>
+            </div>
+            <div>
+              <dt>Valid</dt>
+              <dd>0</dd>
+            </div>
+            <div>
+              <dt>Not valid</dt>
+              <dd>0</dd>
+            </div>
+          </dl>
+        </div>
+        <p class="note">
+          Square corners throughout, no shadows. Depth comes from rules. Focus
+          is a 2px orange ring at 3px offset, kept on every control.
+        </p>
+      </div>
+
+      <footer>FileSure · registry decoder · design system</footer>
+    </div>
+  </body>
+</html>
