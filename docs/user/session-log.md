@@ -15,7 +15,7 @@ Each entry keeps the same shape:
 ## Session 1: Read the brief and wrote the plan
 
 **Date:** 26 November 2026
-**Branch:** `main`, local only, no remote yet
+**Branch:** `main`, in sync with `origin/main` on github.com/omshukladev/fileSure-project (private)
 
 ### Goal
 
@@ -57,16 +57,18 @@ Read the FileSure internship assignment, work out what the product actually is, 
 ### Left over
 
 - Nothing is scaffolded yet. No `package.json`, no app code.
-- The repository exists locally on `main` with the first commit in place. It has no remote yet, so nothing is pushed.
+- The repository is live at github.com/omshukladev/fileSure-project, currently private. Both commits are pushed and the branch is in sync.
+- Remember to flip it to public before you send the assignment in. The brief asks for a public repo link.
 - `extra/` is ignored on purpose. It holds the company's own assignment files, and the submitted repo will be public.
 - Next step is the first unticked box in `docs/scope/scope.md`: `/architect stack & architecture`.
 
 ### Git
 
 - `git init` run, `.gitignore` added covering dependencies, build output, environment files, editor noise, and `extra/`.
-- First commit: `Add scope plan and plain language docs for the CIN checker`.
+- Commit `b1ecbcb`: Add scope plan and plain language docs for the CIN checker.
+- Commit `dc46058`: Record git setup in the session log.
+- Both are on `origin/main`, working tree clean, nothing ahead or behind.
 - Commit trailer `Co-authored-by: CommandCodeBot <noreply@commandcode.ai>` is applied, so the transcript and the history agree about how the work was made.
-- GitHub CLI is authenticated as `omshukla dev`, so creating the public repo and pushing is one command away when you want it. Nothing was pushed, because publishing is your call.
 
 ---
 
