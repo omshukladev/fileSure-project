@@ -12,6 +12,55 @@ Each entry keeps the same shape:
 
 ---
 
+## Session 2: Chose the stack
+
+**Date:** 26 November 2026
+**Branch:** `main`, in sync with `origin/main`
+
+### Goal
+
+Decide the stack and the architecture for the page, and write it down so the build follows it.
+
+### Did
+
+1. Ran pre-flight: in sync with the remote, zero source files, no `AGENTS.md`, no `docs/specs/` yet, so this became spec `0001`.
+2. Walked the stack layer by layer with the engineer: framework, language, styling, components, animation, hosting, structure, rendering, SEO, accessibility, reference data, package manager, CI, and how far to push motion.
+3. Confirmed every version against the real npm registry instead of trusting memory: next 16.4.6, react 19.3.1, tailwindcss 4.3.5, motion 14.14.0, vitest 5.1.2, @playwright/test 1.65.1.
+4. Fetched the official docs for static export, the shadcn Next.js installer, the shadcn Tailwind v4 notes, Tailwind theme config, and the Playwright `webServer` option, and read them rather than skimming search results.
+5. Ran a landscape check that corrected one of my own claims: shadcn/ui's install guide never actually mentions static export, so that pairing is inference rather than documented support. The spec now says so instead of overclaiming.
+6. Wrote spec `0001`, then ran a read only cross check from a second model, which found 6 real blockers.
+7. Applied every blocker fix, then the engineer confirmed the spec.
+
+### Decisions
+
+| Decision | Reason |
+|---|---|
+| Next.js 16 with `output: 'export'` | Wanted by the engineer, emits plain files, so no server runs and the privacy claim stays true |
+| TypeScript, strict | The decode logic has many fields and error reasons; types catch typos at build time |
+| Tailwind CSS v4 with `@theme` tokens | What current shadcn/ui expects, and one visible place for spacing, type and colour |
+| shadcn/ui retuned to FileSure | Accessible primitives without hand building focus and keyboard behaviour, skinned so it belongs on filesure.in |
+| motion, imported from `motion/react` | Purpose built React animation with a real reduced motion path |
+| Pure domain module, no React in it | Makes the decoder testable in plain Node, which is the graded logic |
+| Vitest blocking, Playwright not blocking | Vitest proves the rules; Playwright proves the page and is the first cut if time runs out |
+| Vercel free tier | Made by the Next.js team, so static export deploys without fighting the platform |
+| No database, no auth, no analytics | Every answer is derived from the input, so storing anything would break the promise and add nothing |
+
+### Errors and corrections
+
+- I claimed shadcn/ui officially supports Next.js static export. The landscape check found the install guide is silent on it. Corrected in the spec's Options and Cons rather than left as a confident wrong claim. This is a good one for the video.
+- The cross check found 6 blockers in my first draft: no decoder module path or function names, no directory layout or scaffold command, the motion scope punted to a follow-up, no route or client boundary, no test file locations or script names, and no CI contents. All six are now pinned in a new `## Build shape` section.
+- The cross check also caught a contradiction: the spec promised nothing pasted leaves the browser while a later feature puts pasted codes in a share URL. Fixed by requiring share state to live in the URL hash fragment, never the query string, so it never reaches host logs.
+- A background skills discovery agent ran far too long without returning anything. Killed it and used the skills I could already see were relevant.
+
+### Left over
+
+- Spec `0001` is `Accepted` and in force. Feature 1 in the scope is `in-progress` with the spec linked.
+- Nothing is scaffolded yet. Next box is `Scaffold from the decision: /develop stack & architecture`.
+- `AGENTS.md` still does not exist; `/audit` seeds it from the real scaffold.
+- The briefing in `docs/user/` needs a line about the stack decision so it stays current. Worth doing when the scaffold lands.
+
+---
+
 ## Session 1: Read the brief and wrote the plan
 
 **Date:** 26 November 2026
