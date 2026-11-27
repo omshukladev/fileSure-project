@@ -43,6 +43,24 @@ describe("AC-1 a well formed CIN decodes every block", () => {
     expect(blockOf(reading, "Serial")).toMatchObject({ start: 15, length: 6 });
   });
 
+  it("every CIN span slices back out of cleaned as its own value", () => {
+    const reading = decodeLine(RELIANCE, PINNED);
+    if (!reading.valid) throw new Error("expected valid");
+    for (const block of reading.blocks) {
+      const span = reading.cleaned.slice(block.start, block.start + block.length);
+      expect(span, block.label).toBe(block.value);
+    }
+  });
+
+  it("the spans still line up after a messy paste is cleaned", () => {
+    const reading = decodeLine(" l17110 mh1973 plc019786 ", PINNED);
+    if (!reading.valid) throw new Error("expected valid");
+    for (const block of reading.blocks) {
+      const span = reading.cleaned.slice(block.start, block.start + block.length);
+      expect(span, block.label).toBe(block.value);
+    }
+  });
+
   it("describes the industry block without inventing a lookup", () => {
     const reading = decodeLine(RELIANCE, PINNED);
     if (!reading.valid) throw new Error("expected valid");
@@ -106,6 +124,24 @@ describe("AC-3 an LLPIN never carries a state or a year", () => {
     for (const forbidden of ["State", "Year", "Listing", "Type"]) {
       expect(labels).not.toContain(forbidden);
     }
+  });
+
+  it("spans the whole identifier in cleaned, hyphen or not", () => {
+    for (const input of ["AAA-1234", "AAA1234"]) {
+      const reading = decodeLine(input, PINNED);
+      if (!reading.valid) throw new Error(`expected valid for ${input}`);
+      const block = reading.blocks[0];
+      const span = reading.cleaned.slice(block.start, block.start + block.length);
+      expect(span, input).toBe(reading.cleaned);
+      expect(block.start).toBe(0);
+      expect(block.length).toBe(reading.cleaned.length);
+    }
+  });
+
+  it("keeps the serial without the hyphen in the value", () => {
+    const reading = decodeLine("AAA-1234", PINNED);
+    if (!reading.valid) throw new Error("expected valid");
+    expect(reading.blocks[0].value).toBe("AAA1234");
   });
 
   it("rejects a seven character line that is not three letters then four digits", () => {

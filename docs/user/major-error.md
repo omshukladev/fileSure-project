@@ -104,6 +104,26 @@ grep -c '^MH$'                                              -> 0
 
 ---
 
+### E7. Forty two green tests, and the feature was still wrong
+
+**What happened.** The decoder shipped with 42 passing tests. It reported the LLPIN block as `value: "AAA1234"` starting at position 0 with length 7. The cleaned string was `AAA-1234`. So the block claimed to point at characters `0` to `7`, which are `AAA-123`. The printed value and the highlighted span disagreed by one character, and the span was wrong.
+
+**Why it matters.** This is the most useful mistake in the whole build, because nothing warned me. The tests were green, lint was clean, the typecheck passed, the build was static. Every signal I had said done. The suite simply never asked the question that would have caught it. It checked that the block existed, that its label was right, and that the value was the serial, and it never once compared a block's position against the string that position indexes into.
+
+The bug was latent. Nothing imports the decoder yet, so no page rendered a wrong highlight. It would have surfaced in feature 6 as a highlight one character short, with no obvious cause, while I was building something else.
+
+**How it was caught.** By `/check verify` driving the public API with its own inputs instead of trusting the suite. It wrote a probe that sliced `cleaned` at each block's start and length and compared that slice to the block's value. Six CIN blocks matched. The LLPIN printed `slice=AAA-123 match=false`.
+
+That one assertion is the whole lesson. It is four lines, and it was not in the suite.
+
+**The fix.** Two things, not one. First the span: `length` now counts the cleaned identifier, hyphen included, so highlighting `cleaned[start]` shows the whole code. Second the spec: it said positions index `cleaned` but never said what a slice of them must equal, so I made that explicit for a CIN (equal to the value) and for an LLPIN (covers the identifier, may be one character wider than the hyphen free value, because no contiguous slice of `AAA-1234` equals `AAA1234`).
+
+Then I added the missing assertion to the suite, twice over: every CIN span must slice back out as its own value, and it must still hold after a messy paste is cleaned. The suite went from 42 to 46 tests, and the four new ones are all things it should have had from the start.
+
+**Lesson.** A passing suite proves the cases the author thought of, and the author is the one who cannot see their own blind spot. If a value is a position, assert that the position finds the value. Anything less is hoping. This is the argument for running the real thing rather than reading a green summary, and it is worth showing on screen: same code, same author, one probe run, and the difference between a feature that works and one that only looks like it does.
+
+---
+
 ## Traps we are guarding against
 
 ### T1. Decoding an LLPIN as if it were a CIN

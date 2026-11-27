@@ -128,6 +128,8 @@ Four rules hold this shape together:
 **Key invariants**:
 - `decodeLine` and `decodeList` never throw on any string input, including empty, very long, or containing control characters.
 - `Block.start` and `Fault.start` are zero based indices into `cleaned`, and always point at a character that exists in it. They are never indices into `input`.
+- For a **CIN** block, `cleaned.slice(start, start + length)` equals the block `value` exactly, so the page can render the value and highlight it from the same span.
+- For the **LLPIN** block, `start` and `length` cover the whole identifier in `cleaned` (hyphen included when present), while `value` is the serial with the hyphen removed as punctuation. The span therefore locates the block but can be one character wider than `value`. This is deliberate: highlighting the whole identifier is correct, and no single contiguous slice of `AAA-1234` equals `AAA1234`.
 - A result with `kind: "llpin"` has no block whose label is State, Year, Listing or Type.
 - A result with `valid: false` and `kind: "cin"` may carry blocks, and those blocks describe the parts that did pass.
 - `counts.valid + counts.invalid === counts.read`, always.
@@ -175,7 +177,7 @@ The brief tests this directly. It says a reviewer will paste tricky input, and i
 - The verified table has 36 state codes and no legacy `CT`, `UA` or `TS`. If those were ever issued, a company carrying one is rejected with an explanation rather than accepted.
 - The module will grow as later features ask for more detail, and the union is closed, so a new outcome shape is a deliberate edit.
 - Positions refer to `cleaned`, not to what the visitor typed, because cleaning removes characters. The page must highlight against `cleaned` too, which is a small constraint on feature 6.
-- One code per line. A visitor pasting two codes separated by a space gets a length fault, not a split, so the page needs a hint that says one per line.
+- One code per line. A visitor pasting two codes separated by a space gets an `ILLEGAL_CHARACTER` fault, not a split, so the page needs a hint that says one per line. When the second code is an LLPIN its hyphen is what fails first; when both are CINs the line fails on length.
 
 **Neutral**:
 - Vitest is installed by this feature rather than by the tooling feature, because the suite is the proof.
@@ -193,6 +195,8 @@ Ordered by the Skateboard approach: stand up the thinnest thing that proves the 
 5. [x] Add the year rule with an injectable clock and three distinct year faults, plus the closed `OD` to `OR` near miss table. Tests pin the clock so they never expire. Satisfies **AC-2**, **AC-6**, **AC-7**.
 6. [x] Add the LLPIN path with its shape check, its single block and its cannot encode note, and narrow the result so no state or year field exists to read. Tests assert both hyphen forms pass and that a malformed 7 character line fails as `LLPIN_SHAPE`. Satisfies **AC-3**.
 7. [x] Add `decodeList` with all newline conventions, blank skipping after cleaning, duplicate keeping and counts. Tests assert positions survive a multi line paste, `\r\n` works, and the counts add up. Satisfies **AC-8**.
+
+8. [x] Verify pass fix: the LLPIN block span covered 7 characters of a cleaned line that kept its hyphen, so it pointed one character short. The span now covers the whole identifier and the suite asserts every span slices back out of `cleaned`, which it never did before. Satisfies **AC-1**, **AC-3**.
 
 No database migration applies: nothing is stored.
 

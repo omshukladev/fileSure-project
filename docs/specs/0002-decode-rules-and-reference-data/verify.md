@@ -20,6 +20,7 @@ Not yet verifiable in a browser. Nothing imports `lib/` until feature 6 builds t
 - [ ] Confirm no test asserts a message string where a `FaultCode` would do, so rewording never breaks the suite → AC-2
 - [ ] Confirm `lib/reference/states.ts` contains `MH` with the meaning Maharashtra → AC-1
 - [ ] Confirm `AP`, `DD` and `DN` carry a `note` and no other entry does → AC-6
+- [ ] For every block of every valid result, assert `cleaned.slice(start, start + length)` is non empty and inside `cleaned`; for a CIN it must equal the block value. This is the assertion whose absence let a wrong LLPIN span ship → AC-1, AC-3
 
 ## Value sourcing check
 

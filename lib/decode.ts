@@ -301,7 +301,7 @@ function decodeLlpin(input: string, value: string): Reading {
         value: bare,
         meaning: "Registration number given to the LLP",
         start: 0,
-        length: bare.length,
+        length: value.length,
       },
     ],
     notes: [LLPIN_NOTE],

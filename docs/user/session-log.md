@@ -12,6 +12,44 @@ Each entry keeps the same shape:
 
 ---
 
+## Session 6: Verify caught what the tests missed
+
+**Date:** 27 November 2026
+**Branch:** `main`, ahead of `origin/main` by this commit
+
+### Goal
+
+Run `/check verify decode rules & reference data`, the runtime gate before this feature can be called done.
+
+### Did
+
+1. Ran verify mode by driving the public API with my own inputs instead of trusting the author's suite.
+2. Found the LLPIN block span pointed one character short whenever the pasted code carried a hyphen.
+3. Fixed the span, made the invariant explicit in the spec, and added the four assertions the suite never had.
+4. Re-ran the same probe that found the defect to confirm it was actually gone, rather than trusting the now green suite.
+5. Logged it as E7, the strongest error entry in the file.
+
+### Decisions
+
+| Decision | Reason |
+|---|---|
+| Fix the span, not the value | The spec's value sourcing says the value is the cleaned seven characters. The value was right and the position was wrong |
+| Keep the LLPIN span one character wider when a hyphen is present | No contiguous slice of `AAA-1234` equals `AAA1234`. Highlighting the whole identifier is what the page wants |
+| Make the slice invariant explicit in the spec | The spec said positions index `cleaned` but never said what a slice of them must equal, which is how the bug hid |
+
+### Errors and corrections
+
+- **The LLPIN span was one character short.** `value: "AAA1234"`, `start: 0`, `length: 7`, cleaned `AAA-1234`, so the span resolved to `AAA-123`. Caught by verify, fixed, and logged as E7.
+- **42 green tests, one real bug.** The suite asserted block labels and values and never compared a position against the string it indexes. Now 46 tests, and the four new ones all assert spans.
+- **The spec named the wrong fault code** for two codes on one line (`LENGTH` where the real answer is `ILLEGAL_CHARACTER`, because the LLPIN hyphen fails first). Corrected.
+
+### Left over
+
+- Feature 3 waits on a re-run of `/check verify` to tick its box.
+- Nothing imports the decoder yet. Feature 6 builds the page that does.
+
+---
+
 ## Session 5: Decided the decode rules
 
 **Date:** 26 November 2026
