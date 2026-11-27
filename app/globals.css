@@ -15,9 +15,6 @@
   --font-display: var(--font-archivo), system-ui, sans-serif;
   --font-sans: var(--font-archivo), system-ui, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
-
-  /* This era is rectangular: instruments and forms have corners, not pills */
-  --radius-sm: 2px;
 }
 
 @layer base {
@@ -85,6 +82,59 @@
     font-variant-numeric: tabular-nums;
   }
 
+  /* Outcome stamp: a rubber stamp pressed on paper. Square, outlined, no fill,
+     so the word carries the state and the accent stays at its three uses.
+     Ink for a pass, muted ink for a fail; never colour alone. */
+  .stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    border: 1px solid currentColor;
+    padding: 0.15rem 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .stamp-pass {
+    color: var(--color-ink);
+  }
+
+  .stamp-fail {
+    color: var(--color-ink-muted);
+  }
+
+  /* The LLP label rides inside the stamp, separated by a hairline rather
+     than a second badge, so one result carries one mark. */
+  .stamp-kind {
+    border-inline-start: 1px solid currentColor;
+    padding-inline-start: 0.4em;
+    font-weight: 400;
+    opacity: 0.75;
+  }
+
+  /* A result card: a ruled docket. Containment is one ink rule and a
+     top rail, never a shadow. */
+  .docket {
+    border: 1px solid var(--color-rule);
+    border-top: 2px solid var(--color-ink);
+    background-color: color-mix(in oklch, var(--color-paper) 60%, white);
+  }
+
+  /* The failing characters, marked inline. An ink tint plus a heavy
+     underline, so the mark survives greyscale, forced colours, and a
+     printout, and the accent stays at its three uses. */
+  .fault-mark {
+    background-color: color-mix(in oklch, var(--color-ink) 14%, transparent);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.2em;
+    color: var(--color-ink);
+  }
+
   /* The paste field: resting and focus. The border stays ink in every
      state, so the field never looks disabled. */
   .field-codes {
@@ -92,41 +142,18 @@
     touch-action: manipulation;
   }
 
-  /* Primary control. One place defines every state the button can enter:
-     resting, hover (pointer devices only), pressed, and unavailable.
-     The unavailable state is driven by aria-disabled, not the disabled
-     attribute, so the control stays reachable and keeps announcing why. */
-  .control-primary {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 2.75rem;
-    padding: 0.75rem 1.5rem;
-    border: 2px solid var(--color-ink);
-    background-color: var(--color-ink);
-    color: var(--color-paper);
-    font-family: var(--font-mono);
-    font-size: 0.875rem;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+  /* The empty state's one control. Pointer-only hover, so a touch device
+     does not get a stuck filled state, and a press that responds faster
+     than the hover does. */
+  .example-fill {
     touch-action: manipulation;
     transition:
       background-color 150ms ease-out,
-      border-color 150ms ease-out,
-      transform 100ms ease-out;
+      color 150ms ease-out;
   }
 
-  .control-primary:not([aria-disabled="true"]):active {
+  .example-fill:active {
     transform: scale(0.97);
-  }
-
-  /* Unavailable: recedes without pretending the action worked,
-     and still reads at 6.65:1 against the paper. */
-  .control-primary[aria-disabled="true"] {
-    border-color: var(--color-ink-muted);
-    background-color: var(--color-ink-muted);
-    cursor: not-allowed;
   }
 
   /* One arrival beat per element, not a blanket scroll reveal */
@@ -233,12 +260,15 @@
     transform: none;
   }
 
-  .field-codes,
-  .control-primary {
+  .field-codes {
     transition: none;
   }
 
-  .control-primary:not([aria-disabled="true"]):active {
+  .example-fill {
+    transition: none;
+  }
+
+  .example-fill:active {
     transform: none;
   }
 }
@@ -252,14 +282,9 @@
     background-color: color-mix(in oklch, var(--color-paper) 30%, white);
   }
 
-  .control-primary:not([aria-disabled="true"]):hover {
-    border-color: var(--color-orange);
-    background-color: var(--color-orange);
-  }
-
-  .control-primary[aria-disabled="true"]:hover {
-    border-color: var(--color-ink-muted);
-    background-color: var(--color-ink-muted);
+  .example-fill:hover {
+    background-color: var(--color-ink);
+    color: var(--color-paper);
   }
 }
 

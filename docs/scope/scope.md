@@ -55,11 +55,13 @@ The state and type tables were fetched and checked, not recalled. The verified s
 Match FileSure's own visual language so the page argues it already belongs on filesure.in, and decide the two result layouts (cards for a short paste, a table for a long one) before either is built. Owns type scale, spacing, colour, badges for valid, invalid and LLP, and the base components.
 **Done when:** `design.md` covers type, colour, spacing, the two result layouts and their switch point, and the base components handle focus, keyboard and a phone width.
 - [x] Design it (spec): `/architect design system & UI foundation`
-- [ ] Build it: `/develop results presentation & UI foundation`
+- [x] Build it: `/develop results presentation & UI foundation`
 - [ ] Verify it: `/check verify results presentation & UI foundation`
 Spec [0003](../specs/0003-results-presentation-and-ui-foundation/index.md) · code in `app/globals.css`, `components/results/`, `lib/results/`
 
-The visual language was already mature and measured, so this decided only what was missing: how a decoded result is shown. Cards up to ten lines, a table past ten, and table rows stack back into cards on a phone. One result contract renders twice so the two layouts cannot disagree, and the displayed code is always the cleaned one because that is what the decoder's character positions index.
+The visual language was already mature and measured, so this decided only what was missing: how a decoded result is shown. Cards up to five lines, rows past five, and rows stack on a phone. One result contract renders three ways so the layouts cannot disagree, and the displayed code is always the cleaned one because that is what the decoder's character positions index.
+
+Built 27 November: the pure layer (`layoutFor`, `countReadings`, `totalsSentence`, `plainSentence`, `markSpans`) with 25 new tests, the stamp and fault mark utilities, nine result components, and `Checker` wired with the 250ms debounce. 71 tests pass, lint and typecheck clean, build still static. Three defects were caught by looking at the rendered page rather than by the suite: an LLP card printed its serial twice, an LLP row's collapsed columns pushed the open control out of line, and an LLP row showed an em dash and "Not applicable" together.
 
 ## Slice 1: The smallest usable whole
 

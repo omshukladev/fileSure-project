@@ -1,7 +1,7 @@
 # 0003. Render decoded results as cards, a list, and one result contract
 
 **Date**: 2026-11-27
-**Status**: Proposed
+**Status**: In Progress
 
 ## Summary
 
@@ -199,15 +199,17 @@ A correctness pressure appears only in the view. The decoder reports positions a
 
 Ordered by the Skateboard approach: prove one result end to end, then the second presentation, then the states that get forgotten.
 
-1. Write `lib/results/layout.ts`, `counts.ts`, `summary.ts` and `examples.ts`, all pure and all unit tested, including the 5 and 6 row boundary, the four counts, every sentence template and the totals sentence. Satisfies **AC-1**, **AC-10**.
-2. Add the outcome stamp and card rule utilities to `globals.css`, and raise the micro legend to 11px, with the stamp defined per the stamped table. Satisfies **AC-2**, **AC-11**.
-3. Build `ResultOutcome`, `ResultCode` and `ResultBlocks`, with tests that a fault offset marks the right characters and that an invalid LLPIN renders with no blocks. Satisfies **AC-2**, **AC-5**, **AC-6**.
-4. Build `ResultReading` and `ResultCard`, then `EmptyState` and `Checker`, so one code typed shows one correct card end to end, including the empty state and the debounce. Satisfies **AC-3**, **AC-4**, **AC-9**, **AC-10**.
-5. Change the counts region from three to four columns, rendering `countReadings`, with the phone behaviour for four counts and the announced sentence. Satisfies **AC-10**.
-6. Build `ResultRow` and `ResultList` with native details, then `Results` calling `layoutFor`. Satisfies **AC-7**.
-7. Make the row stack below 640 pixels with a visible label per value, verified at 360 with no horizontal scroll. Satisfies **AC-8**.
-8. Update `.commandcode/design/design-system.md` with the result display, the stamp, the switch point and the phone behaviour. Satisfies **AC-11**.
-9. Delete `--radius-sm` once the last component has landed and nothing references it. Satisfies **AC-11**.
+1. [x] Write `lib/results/layout.ts`, `counts.ts`, `summary.ts` and `examples.ts`, all pure and all unit tested, including the 5 and 6 row boundary, the four counts, every sentence template and the totals sentence. Satisfies **AC-1**, **AC-10**.
+2. [x] Add the outcome stamp and card rule utilities to `globals.css`, and raise the micro legend to 11px, with the stamp defined per the stamped table. Satisfies **AC-2**, **AC-11**.
+3. [x] Build `ResultOutcome`, `ResultCode` and `ResultBlocks`, with tests that a fault offset marks the right characters and that an invalid LLPIN renders with no blocks. Satisfies **AC-2**, **AC-5**, **AC-6**.
+4. [x] Build `ResultReading` and `ResultCard`, then `EmptyState` and `Checker`, so one code typed shows one correct card end to end, including the empty state and the debounce. Satisfies **AC-3**, **AC-4**, **AC-9**, **AC-10**.
+5. [x] Change the counts region from three to four columns, rendering `countReadings`, with the phone behaviour for four counts and the announced sentence. Satisfies **AC-10**.
+6. [x] Build `ResultRow` and `ResultList` with native details, then `Results` calling `layoutFor`. Satisfies **AC-7**.
+7. [x] Make the row stack below 640 pixels with a visible label per value, verified at 360 with no horizontal scroll. Satisfies **AC-8**.
+8. [x] Update `.commandcode/design/design-system.md` with the result display, the stamp, the switch point and the phone behaviour. Satisfies **AC-11**.
+9. [x] Delete `--radius-sm` once the last component has landed and nothing references it. Satisfies **AC-11**.
+
+Two additions the build needed and the plan did not name, both pure and tested: `lib/results/spans.ts` (merges overlapping fault ranges into segments, so a nested mark is impossible) and `lib/results/blocks.ts` (one lookup by label, since an invalid LLPIN has no blocks property and three components need the same guarded read).
 
 No database migration applies: nothing is stored.
 

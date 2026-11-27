@@ -1,3 +1,5 @@
+import { Checker } from "@/components/checker";
+
 const CIN_BLOCKS = [
   { pos: "1", width: "w-6", label: "Listing", sample: "L" },
   { pos: "2 to 6", width: "w-20", label: "Industry", sample: "17110" },
@@ -48,7 +50,7 @@ export default function Home() {
                   >
                     {block.sample}
                   </span>
-                  <span className="legend text-[0.5625rem] text-ink-muted">
+                  <span className="legend text-ink-muted">
                     {block.label}
                   </span>
                 </li>
@@ -61,85 +63,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section
-        id="checker"
-        aria-labelledby="checker-heading"
-        className="mt-14 scroll-mt-6 border-y-2 border-ink py-10 sm:mt-20 sm:py-14"
-      >
-        <h2 id="checker-heading" className="sr-only">
-          Check a list of identifiers
-        </h2>
-        <div className="grid gap-x-10 gap-y-8 sm:grid-cols-[1fr_auto] sm:items-end">
-          <div>
-            <label htmlFor="codes" className="legend text-ink-muted">
-              Paste your identifiers
-            </label>
-            <p
-              id="codes-hint"
-              className="mt-2 max-w-[52ch] text-sm leading-relaxed text-ink-muted"
-            >
-              One per line. Spaces and lower case are cleaned up for you.
-            </p>
-          </div>
-          <p className="font-mono text-xs text-ink-muted">
-            A CIN is 21 characters. An LLPIN looks like AAA-1234.
-          </p>
-        </div>
-
-        <div className="mt-6">
-          <textarea
-            id="codes"
-            name="codes"
-            rows={7}
-            spellCheck={false}
-            autoComplete="off"
-            autoCapitalize="characters"
-            aria-describedby="codes-hint"
-            placeholder={"L17110MH1973PLC019786\nU72900KA2010PTC086596\nAAA-1234"}
-            className="field-codes ruled block w-full resize-y border border-ink bg-white/70 px-4 py-3 font-mono text-base leading-[2] tracking-wide text-ink placeholder:text-ink-muted"
-          />
-        </div>
-
-        <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3">
-          <button
-            type="button"
-            aria-disabled="true"
-            aria-describedby="checker-status"
-            className="control-primary"
-          >
-            Read the list
-          </button>
-          <span id="checker-status" className="legend text-ink-muted">
-            The checker is not built yet
-          </span>
-        </div>
-
-        <div
-          role="status"
-          aria-live="polite"
-          aria-atomic="true"
-          className="sr-only"
-        >
-          {"0 identifiers read. 0 valid, 0 not valid."}
-        </div>
-
-        <dl className="mt-10 grid grid-cols-3 gap-x-6 border-t border-rule pt-6">
-          {[
-            { term: "Read", value: "0" },
-            { term: "Valid", value: "0" },
-            { term: "Not valid", value: "0" },
-          ].map((reading) => (
-            <div key={reading.term} className="flex flex-col gap-2">
-              <dt className="legend text-ink-muted">{reading.term}</dt>
-              <dd className="font-mono text-2xl tabular text-ink sm:text-3xl">
-                <span key={reading.value} className="reading reading-write">
-                  {reading.value}
-                </span>
-              </dd>
-            </div>
-          ))}
-        </dl>
-      </section>
+      <Checker />
 
       <footer className="mt-auto flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 pt-10">
         <p className="font-mono text-xs text-ink-muted">

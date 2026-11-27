@@ -68,11 +68,42 @@ This era is **rectangular**. Instruments and forms have corners. There is no pil
 
 | Token | Value | Role |
 |---|---|---|
-| `--radius-sm` | `2px` | not yet used, reserved |
+| `--radius-sm` | removed | declared, never used, deleted once the result display landed |
 
 Radius is effectively zero on the page. The paste box, the button and the specimen underlines are all square. That is the decision, not an omission.
 
-Depth comes from **rules, not shadows**. There is no `box-shadow` anywhere in the system. Containment is a `1px` ink border on the paste box and `2px` ink borders on section boundaries. One containment strategy, held.
+Depth comes from **rules, not shadows**. There is no `box-shadow` anywhere in the system. Containment is a `1px` ink border on the paste box, `2px` ink borders on section boundaries, and a `1px` rule plus a `2px` ink top rail on a result docket. One containment strategy, held.
+
+## The result display
+
+The results are the product, so they have their own contract. This section is the source of truth for how a decoded reading is shown.
+
+**The switch point is five.** A paste of five lines or fewer renders one card per result. Six or more render as disclosure rows. The rule lives in one function, `layoutFor` in `lib/results/layout.ts`, and screen width never changes it. Width only changes how a row presents itself.
+
+**Why five.** A card carries a code, a sentence and six blocks, and each block renders a label, a value and a meaning. That measures about fourteen lines per card, so five is about seventy lines, which a person will read, and ten would be about a hundred and forty. The paste box already sits at the fold on a laptop, so a taller card wall would bury the answer.
+
+**The stamp.** Outcome is a word in a square outline, never colour alone.
+
+| State | Word | Kind label | Colour |
+|---|---|---|---|
+| valid CIN | `Valid` | none | ink |
+| invalid CIN | `Not valid` | none | ink muted |
+| valid LLPIN | `Valid` | `LLP` | ink, label muted |
+| invalid LLPIN | `Not valid` | `LLP` | ink muted |
+
+The stamp is `.stamp` with `.stamp-pass` or `.stamp-fail`. The kind label is a `.stamp-kind` child, separated by a hairline rather than a second badge, so one result carries one mark. It survives greyscale and forced colours because the word is always present.
+
+**The card** is a docket: `.docket`, a `1px` rule outline with a `2px` ink top rail. One result, full width.
+
+**The row** is a native `<details>` styled as a grid, not a table element. A `details` element cannot be a child of a `tr` (a row may only contain cells, and browsers move anything else out of the table), so the list is a styled disclosure list and gives up native table semantics on purpose. A row holds the code, the stamp, the state, the year and the type; opening it reveals the sentence, the faults and every block. An LLP row shows a dash in the state, year and type columns, with `Not applicable` available to a screen reader only, and the dash columns are fixed width so a short row keeps the same rhythm.
+
+**The failing characters** are marked inline by `.fault-mark`: a 14 percent ink tint plus a `2px` underline. Not orange, because the accent has three uses and a fourth would dilute it, and not colour alone, because a tint by itself vanishes in forced colours and in a printout.
+
+**The code shown is always the cleaned one.** Decoder positions index `cleaned`, so showing the raw paste would mark the wrong characters. When cleaning changed the input, one line names what was pasted.
+
+**Counts** are four: Read, Valid, Not valid, LLP. The LLP count covers every line of that kind, valid or not. The same object feeds the visible figures and the polite live region, so the announcement can never disagree with the display.
+
+**Debounce** is 250 milliseconds. Decoding is local and synchronous, so a loading state would be a lie about work that is not happening.
 
 ## Motion
 
@@ -99,7 +130,9 @@ Hover on the button swaps ink fill for orange fill over 150ms. There is no flick
 
 Focus is a `2px` orange outline at `3px` offset on `:focus-visible`, never removed. The orange clears 5.18:1 against the white paste box and 4.82:1 against the paper, so the ring is visible on every surface it crosses. It is excluded from every transition, so it paints at full contrast on the first frame rather than fading in. Under `forced-colors: active` it becomes a `3px` system `Highlight` ring.
 
-The paste box has a real `<label>` and an `aria-describedby` hint. The counts are a `<dl>` with real `<dt>` and `<dd>`. The button is a real `<button type="button">`, not a div. The CIN block specimen is an ordered list because the order is the meaning.
+The paste box has a real `<label>` and an `aria-describedby` hint. The counts are a `<dl>` with real `<dt>` and `<dd>`. The empty state's example is a real `<button type="button">`, not a div. The CIN block specimen is an ordered list because the order is the meaning.
+
+Results appear as the visitor types, 250 milliseconds after the last keystroke. There is no submit button, because there is nothing to submit: the page decodes locally on every settled change. The old inert "Read the list" button and its `control-primary` styles were removed with the build, since a control that does nothing is worse than no control.
 
 Every control that changes state reports it. A stable `role="status"` region with `aria-live="polite"` and `aria-atomic="true"` holds the running count text, so repeat reads announce consistently rather than inserting a new region each time. It is `sr-only`: it speaks without occupying space.
 
