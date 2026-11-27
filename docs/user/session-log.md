@@ -12,6 +12,58 @@ Each entry keeps the same shape:
 
 ---
 
+## Session 5: Decided the decode rules
+
+**Date:** 26 November 2026
+**Branch:** `main`, ahead of `origin/main` by this commit
+
+### Goal
+
+Settle the domain rules before writing any decoder: the CIN block layout, the state and company type tables, the LLPIN rule, and the exact shape of a decoded result.
+
+### Did
+
+1. Ran `/architect decode rules & reference data`, which asked fourteen design questions in four rounds and settled every one.
+2. Fetched the state code guide rather than recalling the table, and the TaxGuru note on the 2014 Telangana reissue to confirm the `AP` to `TG` change.
+3. Wrote spec `0002` as a directory spec with `index.md` (the build contract, ten acceptance criteria, seven build steps) and `rationale.md` (the checked tables, the options weighed, the sources).
+4. Ran a cross check on a different model before presenting the spec. It found nine gaps, including a missing state code and a type that contradicted its own test.
+5. Closed all nine, recounted both tables, and logged the two real mistakes in `major-error.md` as E5 and E6.
+
+### Decisions
+
+| Decision | Reason |
+|---|---|
+| Clean paste habits silently, report only real breaks | Quiet on lower case and stray spaces, loud on a wrong state code. Announcing every tidy up would shout at a 500 line paste |
+| Year range 1850 to the current year | Broad enough for the oldest registries, strict enough to reject 2099 and 0000. Three distinct faults, not one range message |
+| Name the industry block, ship no code table | The classification has thousands of entries across revisions. A partial table is visibly wrong in places, which is worse than honest |
+| Collect every fault, show the first | Lets the page show the parts that passed, and gives the later filter something to work with |
+| A discriminated union keyed on kind | An LLPIN branch has no state or year field, so the most likely wrong answer becomes a compile error rather than a review catch |
+| State and type tables fetched, not recalled | A remembered table puts `OD` in for Odisha, because the natural abbreviation is the wrong one |
+| `AP` stays valid with a note | Andhra Pradesh still uses `AP` today. Only Telangana was reissued |
+| `DD` and `DN` stay valid with a note | Merged in 2020, but MCA issued no replacement code and old CINs carry them |
+| `CT`, `UA`, `TS` are not asserted | No source confirmed them and the search failed. They fail with an explanation rather than passing on a guess |
+| Positions index the cleaned string | Cleaning removes characters, so raw positions would point at the wrong place. The result carries both `input` and `cleaned` |
+| The hyphen is punctuation, never inserted | You cannot add an LLPIN hyphen before you know the line is an LLPIN. Removing it from `cleaned` keeps every index honest |
+
+### Errors and corrections
+
+- **The state table was missing Maharashtra.** I wrote 35 rows and then asserted it "contains no gaps". My own first happy path test was `L17110MH1973PLC019786`, which that table could not pass. The cross check counted the rows and found it; I confirmed with `wc -l` and `grep -c '^MH$'`. Logged as E5.
+- **The result type contradicted the spec's own test.** The invalid branch had nowhere to put decoded blocks, while the test demanded a bad state still show the year and type. Also found: `FaultCode` never enumerated, positions ambiguous, no LLPIN shape check, and a hyphen insertion rule that could not run before kind detection. Logged as E6.
+- **Asked for a model that does not exist, again.** I passed `glm-5.3-flash` and the tool said "did you mean `z-ai/glm-5.3-flash`". Same shape as E1: a plausible name that was never checked. The fix was to read the error and use the real name.
+- Web search returned 502 twice while trying to confirm the legacy codes, so the legacy claim was dropped rather than guessed.
+
+### Left over
+
+- The decoder itself is not written. Feature 3 is designed, not built.
+- Feature 2 still needs Prettier, Playwright and the CI workflow. Vitest arrives with the decoder.
+- The card to table switch point is still undecided, and feature 4 owns it.
+
+### Git
+
+- Commit below: decode rules spec, scope link, and the two logged errors.
+
+---
+
 ## Session 4: Design passes, motion, audit and verification
 
 **Date:** 26 November 2026

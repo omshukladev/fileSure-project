@@ -67,6 +67,43 @@ Add to this file while you build. Do not tidy it later.
 
 ---
 
+### E5. The state table was missing Maharashtra, and I claimed it was complete
+
+**What happened.** While writing spec 0002, the decode rules spec, I wrote out the MCA state code table from a fetched source. I then wrote the sentence, "The set covers 28 states and 8 union territories and contains no gaps, which is itself a useful signal that the list is complete." I was reasoning that 36 is the right total, so a list that looked the right size must be right.
+
+It had 35 rows. Maharashtra was missing.
+
+**Why it matters.** This is worse than a typo. The table decides which real companies pass the checker. Without `MH`, every Maharashtra company on earth would be reported invalid, including Reliance Industries, whose CIN is the example the whole page is built around. My own spec's first happy path test was `L17110MH1973PLC019786`, which my own table could not pass.
+
+And the sentence I wrote is the tell. I did not count the rows. I looked at the list, recognised the shape of it, and announced that it was complete. The confidence was entirely manufactured.
+
+**How it was caught.** By asking a different model to cross check the spec before I presented it. It counted the rows, found 35 against a claimed 36, noticed the alphabet jumps from `LD` to `ML`, and put `MH` exactly where it belonged. Then it pointed out the deeper problem: my "no gaps so it must be complete" reasoning was not a check at all.
+
+I confirmed it locally in one command rather than trusting the critique:
+
+```
+grep -o '| [A-Z][A-Z] |' ... | tr -d '| ' | sort | wc -l    -> 35
+grep -c '^MH$'                                              -> 0
+```
+
+**The fix.** Restored Maharashtra, recounted both columns (18 and 18), and added the recount instruction to the spec itself so the next edit cannot repeat it. The type table was recounted the same way and does hold 12.
+
+**Lesson.** "That looks about right" is not verification. A count is verification. If you state a number, run the thing that produces that number, and if a list claims completeness, count it against the total you claimed. The most dangerous sentence in a spec is one that asserts its own correctness.
+
+---
+
+### E6. The result type could not hold what the spec demanded
+
+**What happened.** The same cross check found that my invalid result had nowhere to put the blocks that did decode, while the spec's own test demanded that a bad state code still show the year, type and serial.
+
+**Why it matters.** Two rules in the same document contradicted each other. A builder following the type would have written a function that returns nothing useful for an invalid line, and the test would have failed with no obvious cause.
+
+**Other gaps it found in the same pass.** The error code union was never enumerated, so two builders would have invented different names. Fault positions did not say which string they indexed into, and cleaning removes characters, so the page could have highlighted the wrong thing. The LLPIN was never given a shape check, so `1234567` would have passed as valid. The hyphen insertion rule contradicted kind detection, because you cannot add an LLPIN hyphen before you know the line is an LLPIN.
+
+**Lesson.** A type and a test scenario are two statements of the same rule. If they disagree, one of them is wrong, and only reading both together finds it.
+
+---
+
 ## Traps we are guarding against
 
 ### T1. Decoding an LLPIN as if it were a CIN
