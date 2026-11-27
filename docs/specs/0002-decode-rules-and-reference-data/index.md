@@ -1,7 +1,7 @@
 # 0002. Decode CIN and LLPIN with one pure module and sourced reference tables
 
 **Date**: 2026-11-26
-**Status**: Proposed
+**Status**: In Progress
 
 ## Summary
 
@@ -20,8 +20,8 @@ One pure TypeScript module turns a pasted line into a typed result. It decides w
 - **AC-1**: A well formed 21 character CIN returns `valid: true` with all six blocks present in order: listing, industry, state, year, type and serial. Each block carries its value, a plain meaning, and its zero based start position in the cleaned line.
 - **AC-2**: Every block is checked independently and every broken block produces its own fault, each carrying a stable machine code from the closed `FaultCode` union, a plain sentence, and the start position of the offending characters in the cleaned line. Line level faults (length, illegal character, LLPIN shape) stop block checking, because positions are not trustworthy once the shape is wrong. An invalid result still carries the blocks that did decode.
 - **AC-3**: A well formed LLPIN returns `valid: true` with `kind: "llpin"` and no state block, no year block, no listing and no type. TypeScript refuses to read those fields from an LLPIN result, so the mistake fails at compile time rather than at review. Every valid LLPIN carries a fixed note saying it is a plain serial number that identifies the LLP but encodes no state, year, listing status or company type.
-- **AC-4**: Cleaning fixes paste habits silently and never changes meaning. Lower case is upper cased, leading and trailing whitespace is trimmed, whitespace inside the line is removed, invisible characters (zero width space, zero width no break space, byte order mark, non breaking space, tabs) are removed. A leading zero in the serial is kept. The hyphen is treated as punctuation throughout: kind detection runs on the hyphen stripped string, and `cleaned` holds the line with the hyphen removed, so no character is ever added that the visitor did not type.
-- **AC-5**: A line whose cleaned length is not 21 reports the count it arrived at and the count expected. A line containing a character outside A to Z and 0 to 9 reports that character and its position, and the hyphen inside a CIN is reported rather than deleted. Reported positions and counts always refer to `cleaned`, which is also the string `cleaned` carries, so a reported index always points at a character that exists.
+- **AC-4**: Cleaning fixes paste habits silently and never changes meaning. Lower case is upper cased, leading and trailing whitespace is trimmed, whitespace inside the line is removed, invisible characters (zero width space, zero width no break space, byte order mark, non breaking space, tabs) are removed. A leading zero in the serial is kept. The hyphen is kept in `cleaned` so its position stays real, and kind detection runs on a separate view with hyphens removed, so `AAA-1234` and `AAA1234` both count as 7 characters and both pass.
+- **AC-5**: A line whose cleaned length is not 21 reports the count it arrived at and the count expected. A line containing a character outside A to Z and 0 to 9 reports that character and its position, and a hyphen inside a CIN is reported as `ILLEGAL_CHARACTER` at its real position rather than deleted, so `L-17110MH1973PLC019786` fails instead of silently passing. Reported positions and counts always refer to `cleaned`, which is also the string `cleaned` carries, so a reported index always points at a character that exists.
 - **AC-6**: A state code or company type code that is not in the sourced table fails with its own named fault. The near miss `OD` carries a suggested `OR`. An `AP` code stays valid and carries an informational note that Telangana codes were reissued as `TG` in 2014. A `DD` or `DN` code stays valid and carries a note that the two territories merged in 2020.
 - **AC-7**: The year block must be four digits between 1850 and the current year inclusive. A block containing a letter or punctuation fails as `YEAR_INVALID`, a four digit year before 1850 fails as `YEAR_TOO_EARLY`, and a four digit year after the current year fails as `YEAR_IN_FUTURE`. These three are distinct faults, not one range fault.
 - **AC-8**: `decodeList` splits on any newline convention (`\r\n`, `\r`, or `\n`) so a paste straight from a spreadsheet works, skips lines that are empty after cleaning, decodes every remaining line in order, keeps repeated codes as separate rows, and returns counts where `read` equals the number of rows, and `valid` plus `invalid` equals `read`.
@@ -108,9 +108,9 @@ Four rules hold this shape together:
 
 | Action | Value produced / displayed | Source |
 |---|---|---|
-| Kind detection | `kind` | Derived from `cleaned`: exactly 7 characters is an LLPIN, anything else is a CIN. The hyphen is removed before this test, so `AAA-1234` and `AAA1234` both clean to 7 characters |
+| Kind detection | `kind` | Derived from `cleaned` with hyphens removed: exactly 7 characters is an LLPIN, anything else is a CIN. The hyphen is only stripped for this count, so its position in `cleaned` stays real |
 | Every block | `start`, `length` | Fixed offsets from the CIN layout, declared once in `lib/decode.ts`, measured against `cleaned` |
-| Every fault | `start`, `length` | The offsets of the block that failed, measured against `cleaned` |
+| Every fault | `start`, `length` | The offsets of the block that failed, or the offset of the offending character, measured against `cleaned` |
 | Listing block | meaning, "Listed" or "Unlisted" | `L` or `U`, from the layout rule |
 | Industry block | value, and the note that it is a national industrial classification code | The five characters, plus a fixed label. No code table, decided in this spec |
 | State block | meaning, the state name | `lib/reference/states.ts`, checked against the source in References |
@@ -148,7 +148,7 @@ Four rules hold this shape together:
 - Failure: `L17110MH2099PLC019786` fails on the year alone as `YEAR_IN_FUTURE`, and `L17110MH1849PLC019786` as `YEAR_TOO_EARLY`, with the clock pinned so neither test expires, verifies **AC-7**.
 - Failure: `L17110MH1973XYZ019786` fails on the type block by name, verifies **AC-6**.
 - Failure: `L-17110MH1973PLC019786` reports an illegal character at index 1 rather than deleting the hyphen, verifies **AC-5**.
-- Failure: `12A34567` fails as `LLPIN_SHAPE`, not as a CIN, verifies **AC-3**.
+- Failure: `12A3456` fails as `LLPIN_SHAPE`, because 7 characters routes to the LLPIN path and the shape is wrong, verifies **AC-3**.
 - Boundary: `AP` passes with the reissue note, `DD` and `DN` pass with the merger note, and `CT`, `UA` and `TS` fail with a named unknown state fault, verifies **AC-6**.
 - Boundary: every `FaultCode` member is asserted by at least one test, verifies **AC-10**.
 - List handling: a paste with a blank line, a trailing newline, `\r\n` separators and one repeated code yields rows equal to the non blank lines, duplicates kept, and counts that add up, verifies **AC-8**.
@@ -186,13 +186,13 @@ The brief tests this directly. It says a reviewer will paste tricky input, and i
 
 Ordered by the Skateboard approach: stand up the thinnest thing that proves the harness, then grow the same two functions until every rule is covered.
 
-1. Create `lib/types.ts` with the union, `Block`, `Fault`, `FaultCode` and `List`, plus `lib/decode.ts` exporting `decodeLine` that returns a length fault for any input. Install Vitest and add the `test` script. One test proves the harness runs. Satisfies **AC-9**, **AC-10**.
-2. Write the cleaning pass: strip invisible characters, trim, upper case, remove internal whitespace, strip hyphens for kind detection and store `cleaned` with them removed. Build kind detection on the cleaned length. Tests for lower case, inner spaces, a byte order mark, `AAA1234` and a hyphen inside a CIN staying reported. Satisfies **AC-4**, **AC-5**.
-3. Add `lib/reference/states.ts` and `lib/reference/company-types.ts` from the verified tables, recounting both, each with its source recorded and a `note` field on `AP`, `DD` and `DN`. Build the happy path: a well formed CIN returns all six blocks with meanings and offsets against `cleaned`. The Reliance example becomes the first real test. Satisfies **AC-1**, **AC-6**.
-4. Add block validation that collects every fault rather than stopping at the first, keeps the blocks that did pass, and adds the line level faults for length, illegal characters and LLPIN shape. A test per fault code. Satisfies **AC-2**, **AC-5**.
-5. Add the year rule with an injectable clock and three distinct year faults, plus the closed `OD` to `OR` near miss table. Tests pin the clock so they never expire. Satisfies **AC-2**, **AC-6**, **AC-7**.
-6. Add the LLPIN path with its shape check, its single block and its cannot encode note, and narrow the result so no state or year field exists to read. Tests assert both hyphen forms pass and that a malformed 7 character line fails as `LLPIN_SHAPE`. Satisfies **AC-3**.
-7. Add `decodeList` with all newline conventions, blank skipping after cleaning, duplicate keeping and counts. Tests assert positions survive a multi line paste, `\r\n` works, and the counts add up. Satisfies **AC-8**.
+1. [x] Create `lib/types.ts` with the union, `Block`, `Fault`, `FaultCode` and `List`, plus `lib/decode.ts` exporting `decodeLine` that returns a length fault for any input. Install Vitest and add the `test` script. One test proves the harness runs. Satisfies **AC-9**, **AC-10**.
+2. [x] Write the cleaning pass: strip invisible characters, trim, upper case, remove internal whitespace, and keep the hyphen in `cleaned` while using a hyphen stripped view only for kind detection. Build kind detection on that view. Tests for lower case, inner spaces, a byte order mark, `AAA1234` and a hyphen inside a CIN staying reported at its real position. Satisfies **AC-4**, **AC-5**.
+3. [x] Add `lib/reference/states.ts` and `lib/reference/company-types.ts` from the verified tables, recounting both, each with a `note` field on `AP`, `DD` and `DN`. Build the happy path: a well formed CIN returns all six blocks with meanings and offsets against `cleaned`. The Reliance example becomes the first real test. Satisfies **AC-1**, **AC-6**.
+4. [x] Add block validation that collects every fault rather than stopping at the first, keeps the blocks that did pass, and adds the line level faults for length, illegal characters and LLPIN shape. A test per fault code. Satisfies **AC-2**, **AC-5**.
+5. [x] Add the year rule with an injectable clock and three distinct year faults, plus the closed `OD` to `OR` near miss table. Tests pin the clock so they never expire. Satisfies **AC-2**, **AC-6**, **AC-7**.
+6. [x] Add the LLPIN path with its shape check, its single block and its cannot encode note, and narrow the result so no state or year field exists to read. Tests assert both hyphen forms pass and that a malformed 7 character line fails as `LLPIN_SHAPE`. Satisfies **AC-3**.
+7. [x] Add `decodeList` with all newline conventions, blank skipping after cleaning, duplicate keeping and counts. Tests assert positions survive a multi line paste, `\r\n` works, and the counts add up. Satisfies **AC-8**.
 
 No database migration applies: nothing is stored.
 

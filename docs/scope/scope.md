@@ -45,11 +45,11 @@ Root `AGENTS.md` holds the stack, the Skateboard approach, the commands, eight r
 The one place the domain rules live, because guessing here is what makes a checker wrong. Decides the exact block layout of a CIN, the full table of MCA state codes, the full table of company type codes, how NIC industry digits are described (or deliberately left unexplained), the LLPIN pattern, and the shape of one parsed result plus its error reasons. Everything in slices 1 to 3 rests on this.
 **Done when:** the spec carries the state table, the type table and the error reason list, each entry traceable to a source, and states plainly what an LLPIN can and cannot tell you.
 - [x] Design it (spec): `/architect decode rules & reference data`
-- [ ] Build it: `/develop decode rules & reference data`
+- [x] Build it: `/develop decode rules & reference data`
 - [ ] Verify it: `/check verify decode rules & reference data`
 Spec [0002](../specs/0002-decode-rules-and-reference-data/index.md) · code in `lib/decode.ts`, `lib/types.ts`, `lib/reference/`
 
-The state and type tables were fetched and checked, not recalled. The verified state list has 36 codes and the type list has 12. An LLPIN is modelled as a union branch with no state or year field, so the trap fails at compile time.
+The state and type tables were fetched and checked, not recalled. The verified state list has 36 codes and the type list has 12. An LLPIN is modelled as a union branch with no state or year field, so the trap fails at compile time. Built: `decodeLine` and `decodeList` with 42 passing tests, lint and typecheck clean, build still static.
 
 ### 4. Design system & UI foundation · needs a decision
 Match FileSure's own visual language so the page argues it already belongs on filesure.in, and decide the two result layouts (cards for a short paste, a table for a long one) before either is built. Owns type scale, spacing, colour, badges for valid, invalid and LLP, and the base components.
