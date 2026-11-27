@@ -13,7 +13,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 |---|---------|-------|--------|
 | 1 | Stack & architecture | Foundation | done |
 | 2 | Coding standards & tooling | Foundation | in-progress |
-| 3 | Decode rules & reference data | Foundation | planned |
+| 3 | Decode rules & reference data | Foundation | done |
 | 4 | Design system & UI foundation | Foundation | in-progress |
 | 5 | Decoder & test suite | Slice 1 | planned |
 | 6 | Checker page & results | Slice 1 | planned |
@@ -41,7 +41,7 @@ Capture the conventions the assignment is judged on (readable code you can expla
 - [ ] Check it runs clean: `/check verify tooling`
 Root `AGENTS.md` holds the stack, the Skateboard approach, the commands, eight rules and five gotchas. Prettier, Vitest and Playwright are still to install.
 
-### 3. Decode rules & reference data · in-progress
+### 3. Decode rules & reference data · done
 The one place the domain rules live, because guessing here is what makes a checker wrong. Decides the exact block layout of a CIN, the full table of MCA state codes, the full table of company type codes, how NIC industry digits are described (or deliberately left unexplained), the LLPIN pattern, and the shape of one parsed result plus its error reasons. Everything in slices 1 to 3 rests on this.
 **Done when:** the spec carries the state table, the type table and the error reason list, each entry traceable to a source, and states plainly what an LLPIN can and cannot tell you.
 - [x] Design it (spec): `/architect decode rules & reference data`
@@ -51,10 +51,15 @@ Spec [0002](../specs/0002-decode-rules-and-reference-data/index.md) · code in `
 
 The state and type tables were fetched and checked, not recalled. The verified state list has 36 codes and the type list has 12. An LLPIN is modelled as a union branch with no state or year field, so the trap fails at compile time. Built: `decodeLine` and `decodeList` with 46 passing tests, lint and typecheck clean, build still static. Verified 27 November: all 10 acceptance criteria met, and verify caught a wrong LLPIN block span that the 42 green tests had missed (logged as E7).
 
-### 4. Design system & UI foundation · needs a decision
+### 4. Design system & UI foundation · in-progress
 Match FileSure's own visual language so the page argues it already belongs on filesure.in, and decide the two result layouts (cards for a short paste, a table for a long one) before either is built. Owns type scale, spacing, colour, badges for valid, invalid and LLP, and the base components.
 **Done when:** `design.md` covers type, colour, spacing, the two result layouts and their switch point, and the base components handle focus, keyboard and a phone width.
-- [ ] Design it (spec): `/architect design system & UI foundation`
+- [x] Design it (spec): `/architect design system & UI foundation`
+- [ ] Build it: `/develop results presentation & UI foundation`
+- [ ] Verify it: `/check verify results presentation & UI foundation`
+Spec [0003](../specs/0003-results-presentation-and-ui-foundation/index.md) · code in `app/globals.css`, `components/results/`, `lib/results/`
+
+The visual language was already mature and measured, so this decided only what was missing: how a decoded result is shown. Cards up to ten lines, a table past ten, and table rows stack back into cards on a phone. One result contract renders twice so the two layouts cannot disagree, and the displayed code is always the cleaned one because that is what the decoder's character positions index.
 
 ## Slice 1: The smallest usable whole
 

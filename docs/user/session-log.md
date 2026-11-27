@@ -12,6 +12,55 @@ Each entry keeps the same shape:
 
 ---
 
+## Session 7: Decided how results are shown
+
+**Date:** 27 November 2026
+**Branch:** `main`, ahead of `origin/main` by this commit
+
+### Goal
+
+Settle the design system and UI foundation, the last undecided part of the interface, before the page is built.
+
+### Did
+
+1. Found the visual language already finished and measured, so this turned into an enhancement rather than a new direction. Read `globals.css`, `page.tsx` and the existing design system doc to confirm what was real.
+2. Asked only what was genuinely undecided: the result display, the switch point, the stamp, the row detail, the phone behaviour and the empty state.
+3. Wrote spec `0003` as a directory spec with 11 acceptance criteria and nine build steps.
+4. Ran a cross check on a different model. It found 12 gaps and 9 were real, including two that were factually wrong rather than merely vague.
+5. Measured the card size claim that was wrong, confirmed the invalid LLPIN branch has no blocks, and rewrote the spec with the pins.
+
+### Decisions
+
+| Decision | Reason |
+|---|---|
+| Cards up to five, rows past five | Ten cards is about 140 lines, not the two screens I claimed. Five is about seventy, which a person will read |
+| Rows are native details, not a table element | A details element cannot sit in a table row, and the full reading in one cell defeats the expansion |
+| One rule picks the layout: row count, never width | Two rules that both pick a layout will eventually disagree. Width only changes how a row presents itself |
+| Four fixed sentence templates | The most valuable line on the page cannot be "derived". It needs words, and it needs to be testable |
+| Word stamp, ink only | Orange stays at three uses, and state survives greyscale and forced colours |
+| Show the cleaned code, name the original | Positions index the cleaned string. Showing the raw paste would mark the wrong character |
+| Four counts, LLP over every line | A 40 line LLP paste needs its own total, and `decodeList` needs no new field |
+| Invalid LLPIN shows code and faults only | That branch has no `blocks` property at all, confirmed in `lib/types.ts` |
+| No component library | Five primitives, all already styled by tokens. A library would be retuned almost entirely |
+| 250ms debounce, pinned | "Debounced" is a description, not a decision |
+
+### Errors and corrections
+
+- **Ten cards is not two screens.** It measures about 140 lines. The cross check caught the arithmetic; I confirmed it by counting a real card's lines. Limit lowered to five. Logged as E8.
+- **`details` inside a `table` row is invalid HTML.** My spec asserted a DOM shape that browsers reject. The list is now a styled disclosure list, and the lost table semantics are stated as a cost.
+- **The phone rule contradicted the row count rule.** Width would have chosen a third layout, so there would have been two components for the same row count.
+- **AC-5 could not be built for an invalid LLPIN.** `LlpinReading`'s false branch has no `blocks` property. Confirmed by reading the type and by probing `1234567`, which routes to the LLPIN path and returns no blocks.
+- **A valid LLPIN would print its serial twice.** The code shows `AAA-1234` and its one block shows `AAA1234`. Now stated that the block serial is not repeated.
+- **The example LLPIN was never pinned.** It is `AAA-1234`, confirmed valid, now a fixed constant.
+
+### Left over
+
+- Feature 4 is designed, not built. Nine build steps wait.
+- The checkup's finding 4, the paste box below the fold, is still open and belongs to feature 6.
+- The five row limit is a judgement to revisit once real pastes are tried.
+
+---
+
 ## Session 6: Verify caught what the tests missed
 
 **Date:** 27 November 2026

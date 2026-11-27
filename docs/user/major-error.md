@@ -124,6 +124,40 @@ Then I added the missing assertion to the suite, twice over: every CIN span must
 
 ---
 
+### E8. I claimed ten cards was two screens. It was about 140 lines.
+
+**What happened.** While designing how results are shown, I set the limit at ten cards and wrote, in the spec's own rationale, "Ten cards carrying a sentence and six labelled values each is about two screens of reading, which a person will do."
+
+A cross check said the number was wrong. It was. One card carries a code, a sentence and six blocks, and each block has a label, a value and a meaning on separate lines. That is roughly fourteen lines per card. Ten cards is about **140 lines**, which is closer to ten screens than two.
+
+**Why it matters.** This is not a code bug, so no test would ever have caught it. It is a claim about the product, stated confidently, inside a document whose whole job is to be the source of truth for a build. The limit of ten would have shipped, and the first person to paste twelve codes would have hit a scroll wall immediately under a paste box that already sits at the fold on a laptop. The page's one job would have been buried.
+
+The sentence is the tell, exactly like E5. "Is about two screens" sounds like an estimate I had checked. I had not counted anything. I pictured a card in my head, guessed, and wrote it as a fact.
+
+**How it was caught.** The cross check reasoned about what a card actually contains. I then counted it properly with a probe against the real decoder output: six blocks, each rendering a label, a value and a meaning, so roughly fourteen lines per card, so about 140 for ten.
+
+**The fix.** The limit is five, which is about seventy lines, and it lines up with the most common real case: someone checking their own company's code. The number is one tested function, so changing it again is a one line edit.
+
+**Lesson.** Any claim with a number in it needs the number produced, not recalled. "Two screens" is a measurement claim dressed as a vibe. If you cannot say how you counted, you did not count.
+
+---
+
+### E9. I specified HTML that browsers reject
+
+**What happened.** The same spec said the result table would use a native `details` element inside a table row, so a row could open into its full reading with no JavaScript.
+
+A `details` element cannot be a child of a `tr`. A table row may only contain cells, and browsers move anything else out of the table. The instruction would have produced a broken layout with no obvious cause, and the builder would have had to invent a different design partway through.
+
+**Why it matters.** The rest of the spec argued carefully from that premise, including a paragraph explaining why native disclosures were chosen. The premise was false, so the argument was decoration.
+
+**How it was caught.** The cross check knew the `table` content model. I confirmed the workable alternatives: put the disclosure inside one cell, which is valid but cramped, or drop the `table` element and style a list of disclosures as rows.
+
+**The fix.** The list is a styled disclosure list, not a table element. The cost is stated plainly in the spec rather than hidden: no `table` element means screen reader users get a list rather than a table, which for one record per row is a reasonable trade.
+
+**Lesson.** A DOM shape written in prose is still a claim, and it can be checked against the platform before anyone builds it.
+
+---
+
 ## Traps we are guarding against
 
 ### T1. Decoding an LLPIN as if it were a CIN
