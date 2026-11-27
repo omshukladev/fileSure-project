@@ -3,7 +3,7 @@
 A single page where a CA, a lawyer or a business owner pastes a list of Indian company and LLP identifiers, one per line, and gets back what each one means: valid or not, company or LLP, listed or unlisted, state, year of incorporation and company type. Built to look and read as if it went live on filesure.in tomorrow.
 
 **Build approach:** Skateboard (ship the smallest usable whole, then grow the same page release by release).
-**Workflow:** Alpha (/check verify after /develop). The decoder carries a `· Beta` tag so it also gets a real test suite, because that is where the reviewer's tricky inputs land. `/architect` is the recommended first stop for a feature with a real decision, but skippable when you already know the build. Any feature can carry its own tag to do more or less.
+**Workflow:** Alpha (/check verify after /develop). The decoder ran at Beta while it was live work, so it carries a 46 test suite; that feature is done now. `/architect` is the recommended first stop for a feature with a real decision, but skippable when you already know the build. Any feature can carry its own tag to do more or less.
 
 _These are recommendations to keep your build orderly, not requirements. Skip anything that does not fit: if you already know how to build a feature, use `/develop` and skip `/architect`. You decide when a feature is `done`._
 
@@ -14,14 +14,16 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 1 | Stack & architecture | Foundation | done |
 | 2 | Coding standards & tooling | Foundation | in-progress |
 | 3 | Decode rules & reference data | Foundation | done |
-| 4 | Design system & UI foundation | Foundation | in-progress |
-| 5 | Decoder & test suite | Slice 1 | planned |
-| 6 | Checker page & results | Slice 1 | planned |
-| 7 | Working with long lists | Slice 2 | planned |
-| 8 | Download results as CSV | Slice 2 | planned |
-| 9 | Shareable link | Slice 3 | planned |
-| 10 | Empty, wrong and extreme states | Slice 3 | planned |
-| 11 | Ship it and submit | Slice 4 | planned |
+| 4 | Design system & UI foundation | Foundation | done |
+| 5 | Decoder & test suite | Shipped | done |
+| 6 | Checker page & results | Shipped | done |
+| 10 | Empty, wrong and extreme states | Shipped | done |
+| 11 | Ship it and submit | Submit, next | planned |
+| 7 | Working with long lists | If time allows | planned |
+| 8 | Download results as CSV | If time allows | planned |
+| 9 | Shareable link | If time allows | planned |
+
+Row order is build order. The number is a stable identifier only, so specs that say "feature 6" keep pointing at the same feature. Numbers that look out of order mean the order changed, not that a row is missing.
 
 ## Foundations
 
@@ -33,13 +35,14 @@ Decide how the page is built and scaffold a runnable project so every later slic
 - [x] Verify it: `/check verify stack & architecture`
 Spec [0001](../specs/0001-static-web-stack-for-cin-checker/index.md) · code in `app/`, `next.config.ts`
 
-### 2. Coding standards & tooling · in-progress
+### 2. Coding standards & tooling · in-progress, remaining boxes deferred
 Capture the conventions the assignment is judged on (readable code you can explain simply) and install the guards so every later file follows them, from the real scaffold.
 **Done when:** root `AGENTS.md` reflects the real stack, and lint, format and type checking run clean on the scaffold.
 - [x] Capture conventions + tooling choices: `/audit`
 - [ ] Install the tooling: `/develop tooling`
 - [ ] Check it runs clean: `/check verify tooling`
-Root `AGENTS.md` holds the stack, the Skateboard approach, the commands, eight rules and five gotchas. Prettier, Vitest and Playwright are still to install.
+Root `AGENTS.md` holds the stack, the Skateboard approach, the commands, eight rules and five gotchas. Partly installed as of 27 November: ESLint and Vitest are in and clean across 71 tests, and `npm run lint`, `npm run typecheck` and `npm test` all pass. Still missing are Prettier and Playwright, plus a CI workflow.
+The two open boxes are deliberately skipped, not forgotten. Prettier and CI protect a team over time and score nothing in this brief, and Playwright is called a target rather than a gate by spec 0001, since the browser proof is done by hand with `/check verify`. They are the first thing to do only if the submission is already sent, so they do not hold up the next step. Skipping them means the scope's next step is feature 11, not this row.
 
 ### 3. Decode rules & reference data · done
 The one place the domain rules live, because guessing here is what makes a checker wrong. Decides the exact block layout of a CIN, the full table of MCA state codes, the full table of company type codes, how NIC industry digits are described (or deliberately left unexplained), the LLPIN pattern, and the shape of one parsed result plus its error reasons. Everything in slices 1 to 3 rests on this.
@@ -51,7 +54,7 @@ Spec [0002](../specs/0002-decode-rules-and-reference-data/index.md) · code in `
 
 The state and type tables were fetched and checked, not recalled. The verified state list has 36 codes and the type list has 12. An LLPIN is modelled as a union branch with no state or year field, so the trap fails at compile time. Built: `decodeLine` and `decodeList` with 46 passing tests, lint and typecheck clean, build still static. Verified 27 November: all 10 acceptance criteria met, and verify caught a wrong LLPIN block span that the 42 green tests had missed (logged as E7).
 
-### 4. Design system & UI foundation · in-progress
+### 4. Design system & UI foundation · done
 Match FileSure's own visual language so the page argues it already belongs on filesure.in, and decide the two result layouts (cards for a short paste, a table for a long one) before either is built. Owns type scale, spacing, colour, badges for valid, invalid and LLP, and the base components.
 **Done when:** `design.md` covers type, colour, spacing, the two result layouts and their switch point, and the base components handle focus, keyboard and a phone width.
 - [x] Design it (spec): `/architect design system & UI foundation`
@@ -63,25 +66,53 @@ The visual language was already mature and measured, so this decided only what w
 
 Built 27 November: the pure layer (`layoutFor`, `countReadings`, `totalsSentence`, `plainSentence`, `markSpans`) with 25 new tests, the stamp and fault mark utilities, nine result components, and `Checker` wired with the 250ms debounce. 71 tests pass, lint and typecheck clean, build still static. Three defects were caught by looking at the rendered page rather than by the suite: an LLP card printed its serial twice, an LLP row's collapsed columns pushed the open control out of line, and an LLP row showed an em dash and "Not applicable" together.
 
-## Slice 1: The smallest usable whole
+## Shipped
 
-### 5. Decoder & test suite · Beta
+### 5. Decoder & test suite · done
 Turn one line of text into a typed result: which kind it is, and for a CIN every block decoded or the exact reason it breaks. Pure logic with no screen attached, so it can be tested against the tricky inputs a reviewer will try.
 **Done when:** a test suite proves valid CINs decode every field, each malformed block yields its own named error, LLPINs are recognised, and messy paste habits (extra spaces, mixed case, trailing punctuation, invisible characters) are cleaned before checking.
-- [ ] Build it: `/develop decoder & test suite`
-- [ ] Test it: `/test decoder & test suite`
+- [x] Build it: `/develop decoder & test suite`
+- [x] Test it: `/test decoder & test suite`
+Spec [0002](../specs/0002-decode-rules-and-reference-data/index.md) · code in `lib/decode.ts`, `lib/types.ts`, `lib/reference/`
 
-### 6. Checker page & results
-The page itself: a paste box, live results under it, and each result opening with one plain sentence a non expert understands, then the decoded blocks as labelled values. Cards for a short paste, table for a long one, one column on a phone.
+The suite is 46 tests, not 42: four were added for the LLPIN span fix. It covers every block's own named error, LLPIN recognition, and cleaning (extra spaces, mixed case, trailing punctuation, invisible characters). Written alongside feature 3, which owned the rules, so this row and that one describe the same code from two sides. Verified 27 November with all 10 acceptance criteria met.
+
+### 6. Checker page & results · done
+The page itself: a paste box, live results under it, and each result opening with one plain sentence a non expert understands, then the decoded blocks as labelled values. Cards for a short paste, disclosure rows for a long one, one column on a phone.
 **Done when:** a first time visitor can paste a list with no instructions and read every answer, each invalid line says which block failed and what was expected, and the phone layout is usable at 360 pixels wide.
-- [ ] Build it: `/develop checker page & results`
-- [ ] Verify it: `/check verify checker page & results`
+- [x] Build it: `/develop checker page & results`
+- [x] Verify it: `/check verify checker page & results`
+Spec [0003](../specs/0003-results-presentation-and-ui-foundation/index.md) · code in `app/page.tsx`, `components/checker.tsx`, `components/results/`
 
-## Slice 2: Real client files
+Delivered by the results build and proved by the 27 November verify: paste box with a 250ms debounce, live results, one sentence then the labelled blocks, cards to five lines and rows past it, every invalid line naming its failing block with a suggested fix, and 360px with no horizontal scroll. 11 of 11 acceptance criteria met, 36 of 37 verify steps run. The unrun step is forced colours, which this browser cannot emulate.
+
+### 10. Empty, wrong and extreme states · done
+The brief names these three states as judged, so treat them as designed screens rather than leftovers: an empty page that teaches with a working example, a wrong input that stays calm and specific, and an enormous paste that stays readable.
+**Done when:** the empty state offers a one click example, a single garbage line explains what was expected without an alarm, and a 500 line paste shows a summary rather than a wall of red.
+- [x] Build it: `/develop empty, wrong and extreme states`
+- [x] Verify it: `/check verify empty, wrong and extreme states`
+Code in `components/results/empty-state.tsx`, `components/results/outcome.tsx`, `lib/results/counts.ts`
+
+All three were built during the results work and each was driven in a browser on 27 November rather than judged from code. Empty: a worked example button that fills and decodes both codes. Wrong: one garbage line returns a calm sentence, four named faults and a suggested fix, with no alarm language and no red flood. Extreme: 500 lines gave totals of 500 read, 334 valid, 166 not valid, 167 LLP, kept a keystroke at 12 to 24ms, and drew 19,932 nodes without a freeze. This row had no spec of its own because the behaviour is the results screen's, so the evidence lives in spec 0003's verify.
+
+## Submit, next
+
+### 11. Ship it and submit
+The brief says an entry is not reviewed without these, so they are part of the product, not an afterthought.
+**Done when:** the live URL loads on a phone and a laptop, the repo is public with a short README that explains the decode rules, the AI transcripts are exported unedited, and the ten minute video covers a working demo, one design decision, a code walkthrough and one place the AI was wrong and how it was caught.
+None of the four exist yet, and two are actively failing today. The GitHub repo at `omshukladev/fileSure-project` is private: both the API and the web page return 404, so the brief's public repo requirement fails right now. There is no deploy config and no live URL recorded anywhere, though the static export in `out/` is ready to upload. The transcripts and the video are human work that no skill can do.
+- [ ] Make the repo public and write the README decode rules: `/develop ship it and submit`
+- [ ] Deploy `out/` to a free static host and check the live link on a phone: `/develop ship it and submit`
+- [ ] Export every AI transcript unedited, in full: you
+- [ ] Record the video, screen face and voice, with a demo, one design decision, a code walkthrough and one honest AI miss: you
+- [ ] Send all four to the address the brief came from: you
+
+## If time allows
 
 ### 7. Working with long lists · needs a decision
 Five hundred lines is called out in the brief, and five hundred rich cards will make a browser crawl. Decide how the page stays fast and readable at that size, then add the summary strip and the filter that makes a big paste actionable.
 **Done when:** pasting 500 lines stays responsive while scrolling and typing, a summary shows how many were valid, invalid and LLP, and one control hides the valid ones without losing the counts.
+Two of the three are already true and measured: 500 lines stays responsive (keystroke 12 to 24ms, 19,932 nodes) because rows past five lines use the fast disclosure layout, and the summary strip shows Read, Valid, Not valid and LLP. What is left is the one control that hides the valid rows, which does not exist yet.
 - [ ] Design it (spec): `/architect working with long lists`
 
 ### 8. Download results as CSV
@@ -90,27 +121,11 @@ Let a visitor take the decoded list into a spreadsheet, which is how a CA actual
 - [ ] Build it: `/develop download results as CSV`
 - [ ] Verify it: `/check verify download results as CSV`
 
-## Slice 3: Share and polish
-
 ### 9. Shareable link
 Encode the pasted list into the URL so a colleague opening the link sees the same results, with a sane cap so long lists never produce a broken link.
 **Done when:** opening a share link restores the list and its results, a list beyond the cap shares a clear message instead of a truncated link, and no pasted data is sent anywhere to make it work.
 - [ ] Build it: `/develop shareable link`
 - [ ] Verify it: `/check verify shareable link`
-
-### 10. Empty, wrong and extreme states
-The brief names these three states as judged, so treat them as designed screens rather than leftovers: an empty page that teaches with a working example, a wrong input that stays calm and specific, and an enormous paste that stays readable.
-**Done when:** the empty state offers a one click example, a single garbage line explains what was expected without an alarm, and a 500 line paste shows a summary rather than a wall of red.
-- [ ] Build it: `/develop empty, wrong and extreme states`
-- [ ] Verify it: `/check verify empty, wrong and extreme states`
-
-## Slice 4: Submit
-
-### 11. Ship it and submit
-The brief says an entry is not reviewed without these, so they are part of the product, not an afterthought.
-**Done when:** the live URL loads on a phone and a laptop, the repo is public with a short README that explains the decode rules, the AI transcripts are exported unedited, and the ten minute video covers a working demo, one design decision, a code walkthrough and one place the AI was wrong and how it was caught.
-- [ ] Deploy to a free host and check the live link: `/develop ship it and submit`
-- [ ] Export transcripts, record the video, send the email: `/develop ship it and submit`
 
 ## Deferred
 Out of scope for today, kept so the plan stays honest and so you have something to say when the interviewer asks what you would do next.
@@ -152,7 +167,8 @@ Verified official and reference pages behind the decode rules:
 | `in-progress` (verified) | `/check verify` | `Build it` + milestones ticked; `Verify it` ticked |
 | `done` | **you, when you decide it is** | boxes you ran ticked; the tier's last stage is the suggested point to call it done |
 
-- **Next step** = the first unticked box (always a command or a tracked milestone).
+- **Next step** = the first unticked box, reading top to bottom. A row marked `remaining boxes deferred` is skipped, which is why the next step is the submit row and not the tooling row.
+- **Phases** (`Foundations`, `Shipped`, `Submit, next`, `If time allows`) are build order, top to bottom. `Shipped` means built and proved; `Submit, next` holds the brief's four hard gates; `If time allows` holds real features that the submission does not depend on.
 - **Status** `planned` to `in-progress` to `done`, plus `existing` and `dropped`.
 - **Workflow tier tag** beside a heading (`· Beta`) sets that one feature's rigor above the project default; no tag inherits Alpha.
 - **Workflow** (header line) is the project default: Alpha means `/check verify` after `/develop`. Beta adds `/test`.

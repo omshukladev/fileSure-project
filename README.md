@@ -22,6 +22,25 @@ An LLPIN is 7 characters, `AAA-1234`. It is a plain serial number and carries no
 
 A valid format does not mean the company exists. Only MCA can confirm that.
 
+## The rules that decide valid or invalid
+
+A CIN passes only if every block is one the registrar could actually have issued. The checker is strict on purpose: a wrong answer that says "valid" is worse than one that explains itself.
+
+- **Listing** is `L` or `U`. Anything else fails.
+- **Industry** is five digits. The page reports them but does not interpret them, because the NIC 2008 class list is too large to reproduce honestly and a guess would be worse than silence.
+- **State** must be one of the 36 codes MCA issues. A code outside the table fails and suggests the near miss, so `OD` reports that `OR` is the code for Odisha.
+- **Year** must be between 1850, when the first Indian company law arrived, and the current year. A future year fails.
+- **Type** must be one of the 12 codes in use. Anything else fails.
+- **Serial** must be six digits.
+
+Strictness has a cost worth naming: a real company carrying a legacy state code that MCA no longer issues would be reported as invalid rather than accepted. That trade is deliberate, because accepting any well shaped code would let a typo pass as a real company.
+
+## Why the state table is worth a second look
+
+Telangana companies incorporated before June 2014 were given Andhra Pradesh codes, and MCA reissued them as `TG`. So `AP` and `TG` both appear in the table, and the page notes the history when it sees `AP`. Two legacy codes, `CT` and `UA`, are absent because they are no longer issued, so a company still carrying one is reported as invalid with an explanation.
+
+Every entry in the state and type tables was fetched from a source and checked, not recalled. The links are in `docs/specs/0002-decode-rules-and-reference-data/index.md`.
+
 ## Run it
 
 Node 22 and npm.
@@ -46,9 +65,10 @@ The static files land in `out/`. That folder is the whole deployable site.
 ```bash
 npm run typecheck
 npm run lint
-npm test        # unit tests over the decode rules
-npm run e2e     # browser test against the built site
+npm test        # unit tests over the decode rules and the result display
 ```
+
+The suite is 71 tests. It covers every CIN block's own named error, LLPIN recognition, cleaning of messy pastes, the card to row switch and the fault marks.
 
 ## Where things live
 
