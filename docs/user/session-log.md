@@ -48,6 +48,19 @@ Run `/check verify decode rules & reference data`, the runtime gate before this 
 - Feature 3 waits on a re-run of `/check verify` to tick its box.
 - Nothing imports the decoder yet. Feature 6 builds the page that does.
 
+### Re-verify, same day
+
+Ran `/check verify` again on the fix and drove the public API with a fresh set of inputs rather than reusing the old probe. All ten acceptance criteria met, 19 of 19 steps in `verify.md` ticked, and the ticked box went onto the scope.
+
+New checks this pass that the earlier run had not done:
+
+- every one of the 36 state codes and 12 type codes accepted in a real CIN at runtime, not just counted in the source
+- no duplicate codes in either table
+- 18 hostile inputs, every fault position inside `cleaned`
+- four malformed hyphen forms rejected: `AAA--1234`, `AAA-12-34`, `-AAA1234`, `AAA1234-`
+- all three newline styles give the same counts
+- every not found state code tested, and `ZZ` confirmed to carry no suggestion while `OD` does
+
 ---
 
 ## Session 5: Decided the decode rules
