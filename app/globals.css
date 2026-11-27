@@ -47,15 +47,25 @@
 }
 
 @layer utilities {
-  /* Faint horizontal ruling, like lined printout stock */
+  /* Faint horizontal ruling, like lined printout stock. The rule sits at the
+     bottom of each line box, so each line of typing rests on its own rule.
+     --ruled-line is the single number the ruling and the text share: the text
+     takes it as its line height, the gradient takes it as its period, so they
+     cannot drift apart. The gradient starts at the padding edge, which is why
+     the field carries no top padding: any other value would push every rule
+     half a line out. Local attachment keeps the ruling with the text when a
+     long paste scrolls, instead of sliding out from under it. */
   .ruled {
+    --ruled-line: 2rem;
     background-image: repeating-linear-gradient(
       to bottom,
       transparent,
-      transparent 31px,
-      color-mix(in oklch, var(--color-rule) 42%, transparent) 31px,
-      color-mix(in oklch, var(--color-rule) 42%, transparent) 32px
+      transparent calc(var(--ruled-line) - 1px),
+      color-mix(in oklch, var(--color-rule) 42%, transparent)
+        calc(var(--ruled-line) - 1px),
+      color-mix(in oklch, var(--color-rule) 42%, transparent) var(--ruled-line)
     );
+    background-attachment: local;
   }
 
   /* Bureau poster setting: heavy, condensed, tight. Titles only, never body. */

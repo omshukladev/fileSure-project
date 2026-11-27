@@ -68,7 +68,7 @@ export function Checker() {
           autoCapitalize="characters"
           aria-describedby="codes-hint"
           placeholder={"L17110MH1973PLC019786\nU72900KA2010PTC086596\nAAA-1234"}
-          className="field-codes ruled block w-full resize-y border border-ink bg-white/70 px-4 py-3 font-mono text-base leading-[2] tracking-wide text-ink placeholder:text-ink-muted"
+          className="field-codes ruled block w-full resize-y border border-ink bg-white/70 px-4 pt-0 pb-3 font-mono text-base leading-[var(--ruled-line)] tracking-wide text-ink placeholder:text-ink-muted"
         />
       </div>
 

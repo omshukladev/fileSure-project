@@ -152,6 +152,19 @@ These are intentional and belong to the layout, not the token layer:
 - The grid column ratio `1.15fr 1fr` on the intro row is a one off composition decision.
 - The `82%` font width on the poster is set in the `.poster` utility rather than a token, because it belongs to that one role.
 
+## The paste field
+
+The field is lined printout stock: a `1px` ink border, white at 70 percent, and a faint hairline rule under every line of typing.
+
+The ruling and the text share one number, `--ruled-line`, set in `.ruled` and used by the field as its line height. That is the whole point of it. The rule is drawn at the bottom of each line box, so the characters rest on the rule rather than floating between two of them. The text takes `--ruled-line` as `line-height`; the gradient takes it as its period.
+
+Two rules follow from the geometry, and breaking either puts the ruling back through the middle of the text:
+
+- **No top padding.** The gradient starts at the padding edge, so any top padding would offset every rule by that much. The field uses `pt-0 pb-3`.
+- **`background-attachment: local`.** A long paste scrolls, and the ruling has to scroll with it. The default attachment holds the pattern still while the text moves, so the two drift apart by the scroll amount.
+
+This is the one sanctioned use of a gradient in the system, and it is not decoration: it is a hairline pattern that marks one line from the next. The ban on gradients above is about colour fades, which this is not.
+
 ## What is deliberately absent
 
-No gradients of any kind. No glass or blur. No shadows. No pills. No cards, because the page has no genuinely card shaped content: it is a poster, a form and a readout. No section eyebrow labels above headings, since the legends name real fields rather than decorating a heading. No emoji. No invented cockpit jargon, because the labels name real actions.
+No colour gradients of any kind, the printout ruling aside. No glass or blur. No shadows. No pills. No cards, because the page has no genuinely card shaped content: it is a poster, a form and a readout. No section eyebrow labels above headings, since the legends name real fields rather than decorating a heading. No emoji. No invented cockpit jargon, because the labels name real actions.
